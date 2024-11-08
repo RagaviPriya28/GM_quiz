@@ -3,13 +3,13 @@ const cors = require('cors');
 const logger = require('./config/logger');
 const authRoutes = require('./routes/authRoutes');
 
-require('./config/env'); // Load environment variables
+require('./config/env'); 
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-logger(app); // Apply logger
+logger(app); 
 
 app.use('/api/auth', authRoutes);
 
