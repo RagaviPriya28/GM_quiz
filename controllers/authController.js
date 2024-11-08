@@ -45,4 +45,16 @@ const getProfile = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getProfile };
+const logout = (req, res) => {
+  try {
+    // If using a token-based logout (like JWT), you simply need to tell the client to remove the token.
+    // Alternatively, you can handle token invalidation via server-side tracking or blacklisting if needed.
+
+    res.status(200).json({ message: 'Successfully logged out.' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+module.exports = { register, login, getProfile, logout };
