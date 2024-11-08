@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const logger = require('./config/logger');
 const authRoutes = require('./routes/authRoutes');
+const tenantRoutes = require('./routes/tenantRoutes');
 
 require('./config/env'); 
 
@@ -12,5 +13,6 @@ app.use(express.json());
 logger(app); 
 
 app.use('/api/auth', authRoutes);
+app.use('/api', tenantRoutes);
 
 module.exports = app;
