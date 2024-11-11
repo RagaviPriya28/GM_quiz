@@ -1,20 +1,27 @@
-// routes/categoryRoutes.js
 const express = require('express');
+const router = express.Router();
+const { protect, admin } = require('../middlewares/authMiddleware');
 const {
   createCategory,
   getCategories,
   getCategoryById,
   updateCategory,
-  deleteCategory
+  deleteCategory,
 } = require('../controllers/categoryController');
-const { protect, admin } = require('../middlewares/authMiddleware');
 
-const router = express.Router();
+// Create a new category (admin only)
+router.post('/api/categories', protect, admin, createCategory);
 
-router.post('/categories/', protect, admin, createCategory);
-router.get('/categories/', getCategories);
-router.get('/categories/:id', getCategoryById);
-router.put('/categories/:id', protect, admin, updateCategory);
-router.delete('/categories/:id', protect, admin, deleteCategory);
+// Get all categories
+router.get('/api/categories', getCategories);
+
+// Get a specific category's details
+router.get('/api/categories/:id', getCategoryById);
+
+// Update a category (admin only)
+router.put('/api/categories/:id', protect, admin, updateCategory);
+
+// Delete a category (admin only)
+router.delete('/api/categories/:id', protect, admin, deleteCategory);
 
 module.exports = router;
