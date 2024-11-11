@@ -1,6 +1,6 @@
 const User = require('../models/User');
 
-// Get all users (admin only)
+
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
@@ -10,7 +10,7 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// Get a specific user's details (admin only)
+
 exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -23,7 +23,7 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// Update a user's profile (admin or user themselves)
+
 exports.updateUser = async (req, res) => {
   const { username, email, mobile, password } = req.body;
 
@@ -34,7 +34,7 @@ exports.updateUser = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Only allow user to update their own profile or if they are an admin
+    
     if (user._id.toString() !== req.user._id && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Permission denied' });
     }
@@ -54,7 +54,7 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// Delete a user account (admin only)
+
 exports.deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -62,7 +62,7 @@ exports.deleteUser = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Use deleteOne instead of remove
+    
     await user.deleteOne();
 
     res.status(200).json({ message: 'User deleted successfully' });
