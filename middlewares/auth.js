@@ -13,11 +13,11 @@ const auth = (req, res, next) => {
   }
 };
 
-const isAdmin = (req, res, next) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Access denied. Admins only.' });
+const isSuperAdmin = (req, res, next) => {
+  if (req.user.role !== 'superadmin') {
+    return res.status(403).json({ message: 'Access denied. Super admin only.' });
   }
   next();
 };
 
-module.exports = { auth, isAdmin };
+module.exports = { auth, isSuperAdmin };
