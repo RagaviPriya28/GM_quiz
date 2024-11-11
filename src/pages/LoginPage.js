@@ -7,7 +7,7 @@ import axios from "axios";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext); // Access login method from context
+  const { isAuthenticated, login } = useContext(AuthContext); // Access login method from context
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,6 +15,13 @@ export const LoginPage = () => {
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+
+  // Redirect to home if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("email");
