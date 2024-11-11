@@ -1,5 +1,5 @@
 // src/AuthContext.js
-import React, { createContext, useReducer, useEffect } from "react";
+import React, { createContext, useReducer, useEffect, useState } from "react";
 import axios from "axios";
 import { authReducer } from "../reducers/authReducer";
 
@@ -13,6 +13,7 @@ export const AuthContext = createContext(initialState);
 
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
+  const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -25,14 +26,13 @@ export const AuthProvider = ({ children }) => {
       });
       axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
     }
+    setLoading(false); // Set loading to false after initial check
 
-    // Add interceptor for handling token expiration
+    // Add interceptor for token refresh (if needed)
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
-
-        // Check if the error is a 401 and we haven’t retried yet
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
           try {
@@ -43,9 +43,9 @@ export const AuthProvider = ({ children }) => {
             originalRequest.headers[
               "Authorization"
             ] = `Bearer ${refreshedToken}`;
-            return axios(originalRequest); // Retry with refreshed token
+            return axios(originalRequest);
           } catch (refreshError) {
-            logout(); // Log out if refresh fails
+            logout();
             return Promise.reject(refreshError);
           }
         }
@@ -53,10 +53,7 @@ export const AuthProvider = ({ children }) => {
       }
     );
 
-    // Remove interceptor on unmount
-    return () => {
-      axios.interceptors.response.eject(interceptor);
-    };
+    return () => axios.interceptors.response.eject(interceptor);
   }, []);
 
   const login = async (user, token) => {
@@ -73,15 +70,12 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: "LOGOUT" });
   };
 
-  // Function to refresh token if expired
   const refreshToken = async () => {
     try {
       const response = await axios.post("/api/refresh-token", {
         token: localStorage.getItem("token"),
       });
       const { token } = response.data;
-
-      // Store new token and update axios authorization header
       localStorage.setItem("token", token);
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       return token;
@@ -92,7 +86,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ ...state, login, logout }}>
+    <AuthContext.Provider value={{ ...state, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
