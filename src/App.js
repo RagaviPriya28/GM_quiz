@@ -7,7 +7,8 @@ import Quiz from "./pages/Quiz";
 import LobbyPage from "./pages/LobbyPage";
 import { AuthContext } from "./context/AuthContext";
 import QuestionPageUser from "./pages/QuestionPageUser";
-import SurveyScoreboard from "./pages/SurveyScoreboard";  
+import SurveyScoreboard from "./pages/SurveyScoreboard";
+import QuestionsDetailsAdmin from "./pages/QuestionsDetailsAdmin";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -35,7 +36,13 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/SurveyScoreboard" element={<SurveyScoreboard />} /> 
+        <Route path="/SurveyScoreboard" element={<SurveyScoreboard />} />
+        <Route
+          path="/QuestionsDetailsAdmin/:id"
+          element={
+            <QuestionsDetailsAdmin/>
+          }
+        />
       </Routes>
     </>
   );
