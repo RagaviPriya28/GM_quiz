@@ -1,10 +1,14 @@
 // Navbar.js
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
 import logo from "../assets/GMI-Logo.png";
+import { AuthContext } from "../context/AuthContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useContext(AuthContext);
 
   return (
     <div className="border-b-4 p-2">
@@ -23,15 +27,21 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Right: Login Button */}
-        <div className="flex gap-2">
-          <button
-            className="hover:bg-gray-200 m-4 py-1 px-2 rounded-lg bg-red-100"
-            onClick={() => navigate("/login")}
-          >
-            Get Started
-          </button>
-        </div>
+        {/* Right: Login or User Icon */}
+        {!isAuthenticated ? (
+          <div className="flex gap-2">
+            <button
+              className="hover:bg-gray-200 m-4 py-1 px-2 rounded-lg bg-red-100"
+              onClick={() => navigate("/login")}
+            >
+              Get Started
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 bg-red-200">
+            <FontAwesomeIcon icon={faUser} className="text-gray-700 text-xl" />
+          </div>
+        )}
       </div>
     </div>
   );

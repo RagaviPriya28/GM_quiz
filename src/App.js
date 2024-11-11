@@ -6,9 +6,6 @@ import Home from "./pages/Home";
 import Quiz from "./pages/Quiz";
 import LobbyPage from "./pages/LobbyPage";
 import { AuthContext } from "./context/AuthContext";
-import QuestionPageUser from "./pages/QuestionPageUser";
-import SurveyScoreboard from "./pages/SurveyScoreboard";
-import QuestionsDetailsAdmin from "./pages/QuestionsDetailsAdmin";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -24,6 +21,8 @@ export default function App() {
     <>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/quiz" element={<AdminQuizPage />} />
+        <Route path="/questionadmin" element={<QuestionPageAdmin />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/QuestionPageUser" element={<QuestionPageUser />} />
