@@ -1,28 +1,9 @@
+// Home.js
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Card from "../components/CardComp";
 import logo from "../assets/GMI-Logo.png";
-
-const Card = ({ title, description, imageSrc, buttonText, onClick }) => (
-  <div className="bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300 h-[500px] w-full max-w-[400px]">
-    <h3 className="bg-[#3166c7] text-white text-center py-2 rounded-t-lg">
-      {title}
-    </h3>
-    <img
-      src={imageSrc}
-      alt="card image"
-      className="h-[200px] w-full border-b-4"
-    />
-    <div className="p-5">
-      <p className="text-gray-600 mb-4">{description}</p>
-      <button
-        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
-        onClick={onClick}
-      >
-        {buttonText}
-      </button>
-    </div>
-  </div>
-);
+import Navbar from "../components/NavbarComp";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -30,73 +11,81 @@ export default function Home() {
   return (
     <>
       {/* Navbar */}
-      <div className="border-b-4 p-2">
-        <div className="flex items-center h-12 p-3 gap-4 justify-between">
-          {/* Left: Logo with Welcome Message */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <img
-              src={logo}
-              alt="GMI"
-              className="h-10 w-10 rounded-full cursor-pointer "
-              onClick={() => navigate("/")}
-            />
-            <div>
-              <h1 className="text-lg font-semibold">Welcome to GMI!</h1>
-              <p className="text-sm text-gray-500">
-                Engage, learn, and have fun
-              </p>
-            </div>
-          </div>
+      <Navbar/>
 
-          {/* Right: Login and Register Buttons */}
-          <div className="flex gap-2">
-            <button
-              className="hover:bg-gray-200 m-4 py-1 px-2 rounded-lg bg-red-100"
-              onClick={() => navigate("/login")}
-            >
-              Get Started
-            </button>
-          </div>
-        </div>
-      </div>
-
+      {/* Premium Plans Section */}
       <div className="m-4">
         <h1 className="text-lg font-semibold">Premium Plans</h1>
         <p className="text-gray-400">Unlock more features</p>
       </div>
 
-      {/* Cards */}
+      {/* Create and Join Quiz Boxes */}
+      <div className="flex justify-center gap-4 mt-4">
+        {/* Create Quiz Box */}
+        <div className="flex flex-col items-center p-4 bg-white shadow-md rounded-lg cursor-pointer hover:shadow-lg transition-shadow"
+             onClick={() => navigate("/create-quiz")}>
+          <img src={logo} alt="Create Quiz" className="w-16 h-16 mb-2" />
+          <h2 className="text-lg font-semibold">Create Quiz</h2>
+          <p className="text-gray-500">Create your own custom quizzes.</p>
+          <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg">Start Creating</button>
+        </div>
 
-      <div className="flex justify-center mt-6 sm:pl-10">
+        {/* Join Quiz Box */}
+        <div className="flex flex-col items-center p-4 bg-white shadow-md rounded-lg cursor-pointer hover:shadow-lg transition-shadow"
+             onClick={() => navigate("/join-quiz")}>
+          <img src={logo} alt="Join Quiz" className="w-16 h-16 mb-2" />
+          <h2 className="text-lg font-semibold">Join Quiz</h2>
+          <p className="text-gray-500">Participate in quizzes created by others.</p>
+          <button className="mt-2 px-4 py-2 bg-green-500 text-white rounded-lg">Join Now</button>
+        </div>
+      </div>
+
+      {/* Centered Card Container */}
+      <div className="flex justify-center w-full mt-6 px-4">
         <div className="w-full max-w-[1200px] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <Card
-            title="For Businesses & Professionals"
-            description="Build custom quizzes and share them with your friends."
-            imageSrc={logo}
-            buttonText="Get Started"
-            onClick={() => navigate("/create-quiz")}
-          />
-          <Card
-            title="For Businesses & Professionals"
-            description="Build custom quizzes and share them with your friends."
-            imageSrc={logo}
-            buttonText="Get Started"
-            onClick={() => navigate("/create-quiz")}
-          />
-          <Card
-            title="For Businesses & Professionals"
-            description="Build custom quizzes and share them with your friends."
-            imageSrc={logo}
-            buttonText="Get Started"
-            onClick={() => navigate("/create-quiz")}
-          />
-          <Card
-            title="For Businesses & Professionals"
-            description="Build custom quizzes and share them with your friends."
-            imageSrc={logo}
-            buttonText="Get Started"
-            onClick={() => navigate("/create-quiz")}
-          />
+          {/* Existing Cards */}
+          <div className="flex flex-col items-center space-y-4">
+            <Card
+              title="For Businesses & Professionals"
+              description="Build custom quizzes and share them with your friends."
+              imageSrc={logo}
+              buttonText="Get Started"
+              onClick={() => navigate("/create-quiz")}
+            />
+          </div>
+          <div className="flex flex-col items-center space-y-4">
+            <Card
+              title="For Businesses & Professionals"
+              description="Build custom quizzes and share them with your friends."
+              imageSrc={logo}
+              buttonText="Get Started"
+              onClick={() => navigate("/create-quiz")}
+            />
+          </div>
+          <div className="flex flex-col items-center space-y-4">
+            <Card
+              title="For Businesses & Professionals"
+              description="Build custom quizzes and share them with your friends."
+              imageSrc={logo}
+              buttonText="Get Started"
+              onClick={() => navigate("/create-quiz")}
+            />
+          </div>
+          <div className="flex flex-col items-center space-y-4">
+            <Card
+              title="For Businesses & Professionals"
+              description="Build custom quizzes and share them with your friends."
+              imageSrc={logo}
+              buttonText="Get Started"
+              onClick={() => navigate("/create-quiz")}
+            />
+          </div>
+
+          {/* New Div for "Kahoot at School" */}
+          <div className="flex flex-col items-center space-y-4 p-4 bg-gray-100 rounded-lg shadow-md mt-6">
+            <h2 className="text-xl font-semibold">Kahoot at School</h2>
+            <p className="text-gray-500">Engaging Groups and Distance learning  for teachers and students.</p>
+          </div>
         </div>
       </div>
     </>
