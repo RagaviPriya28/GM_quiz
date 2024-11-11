@@ -62,12 +62,9 @@ exports.deleteUser = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Check if the user is an admin or if they are deleting themselves
-    if (user._id.toString() !== req.user._id && req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Permission denied' });
-    }
+    // Use deleteOne instead of remove
+    await user.deleteOne();
 
-    await user.remove();
     res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
