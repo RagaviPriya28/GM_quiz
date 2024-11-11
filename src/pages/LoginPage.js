@@ -48,10 +48,13 @@ export const LoginPage = () => {
     if (isValid) {
       try {
         // Send a POST request to authenticate
-        const response = await axios.post("http://localhost:5000/api/auth/login", {
-          email,
-          password,
-        });
+        const response = await axios.post(
+          "http://localhost:5000/api/auth/login",
+          {
+            email,
+            password,
+          }
+        );
 
         // If successful, get user and token from response
         const { user, token } = response.data;
@@ -67,7 +70,7 @@ export const LoginPage = () => {
           localStorage.removeItem("password");
         }
 
-        navigate("/home");
+        navigate("/");
       } catch (error) {
         // Handle errors (e.g., incorrect credentials)
         if (error.response && error.response.status === 401) {
