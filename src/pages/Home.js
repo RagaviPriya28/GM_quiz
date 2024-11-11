@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Card from "../components/CardComp";
 import logo from "../assets/GMI-Logo.png";
 import Navbar from "../components/NavbarComp";
+import plus from "../assets/add.png";
+import join from "../assets/join.png"
 
 export default function Home() {
   const navigate = useNavigate();
@@ -22,21 +24,19 @@ export default function Home() {
       {/* Create and Join Quiz Boxes */}
       <div className="flex justify-center gap-4 mt-4">
         {/* Create Quiz Box */}
-        <div className="flex flex-col items-center p-4 bg-white shadow-md rounded-lg cursor-pointer hover:shadow-lg transition-shadow"
+        <div className="flex flex-col items-center p-4 bg-white shadow-md rounded-lg  hover:shadow-lg transition-shadow"
              onClick={() => navigate("/create-quiz")}>
-          <img src={logo} alt="Create Quiz" className="w-16 h-16 mb-2" />
-          <h2 className="text-lg font-semibold">Create Quiz</h2>
-          <p className="text-gray-500">Create your own custom quizzes.</p>
-          <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg">Start Creating</button>
+          <img src={plus} alt="Create Quiz" className="w-16 h-16 mb-2" />
+          <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg">Create Quiz</button>
         </div>
 
         {/* Join Quiz Box */}
-        <div className="flex flex-col items-center p-4 bg-white shadow-md rounded-lg cursor-pointer hover:shadow-lg transition-shadow"
+        <div className="flex flex-col items-center p-4 bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow"
              onClick={() => navigate("/join-quiz")}>
-          <img src={logo} alt="Join Quiz" className="w-16 h-16 mb-2" />
-          <h2 className="text-lg font-semibold">Join Quiz</h2>
-          <p className="text-gray-500">Participate in quizzes created by others.</p>
-          <button className="mt-2 px-4 py-2 bg-green-500 text-white rounded-lg">Join Now</button>
+          <img src={join} alt="Join Quiz" className="w-16 h-16 mb-2" />
+      
+         
+          <button className="mt-2 px-4 py-2 bg-green-500 text-white rounded-lg">Join Quiz</button>
         </div>
       </div>
 
