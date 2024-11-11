@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { AuthContext } from "../context/AuthContext";
+import axios from "axios";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext); // Access login method from context
 
-  // State for email, password, errors, password visibility, and rememberMe checkbox
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -14,7 +16,6 @@ export const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  // Load stored credentials on component mount if rememberMe is checked
   useEffect(() => {
     const storedEmail = localStorage.getItem("email");
     const storedPassword = localStorage.getItem("password");
@@ -26,11 +27,10 @@ export const LoginPage = () => {
     }
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     let isValid = true;
 
-    // Basic validation
     if (!email) {
       setEmailError("Enter a valid email address");
       isValid = false;
@@ -46,19 +46,36 @@ export const LoginPage = () => {
     }
 
     if (isValid) {
-      if (rememberMe) {
-        // Store email and password in localStorage if "Remember me" is checked
-        localStorage.setItem("email", email);
-        localStorage.setItem("password", password);
-      } else {
-        // Clear stored credentials if "Remember me" is unchecked
-        localStorage.removeItem("email");
-        localStorage.removeItem("password");
-      }
+      try {
+        // Send a POST request to authenticate
+        const response = await axios.post("http://localhost:5000/api/auth/login", {
+          email,
+          password,
+        });
 
-      // Proceed with login logic or redirect
-      console.log("Login successful"); // Placeholder
-      navigate("/home"); // Redirect to home or desired route
+        // If successful, get user and token from response
+        const { user, token } = response.data;
+
+        // Call context login function to store user and token globally
+        login(user, token);
+
+        if (rememberMe) {
+          localStorage.setItem("email", email);
+          localStorage.setItem("password", password);
+        } else {
+          localStorage.removeItem("email");
+          localStorage.removeItem("password");
+        }
+
+        navigate("/home");
+      } catch (error) {
+        // Handle errors (e.g., incorrect credentials)
+        if (error.response && error.response.status === 401) {
+          setPasswordError("Invalid email or password");
+        } else {
+          console.error("Login error:", error);
+        }
+      }
     }
   };
 
@@ -174,6 +191,12 @@ export const LoginPage = () => {
               <span>Login with Facebook</span>
             </button>
           </div>
+
+          {/* Divider */}
+          <div className="flex items-center justify-center mt-4">
+            <p>Join quiz using</p>
+          </div>
+
           {/* Join Quiz Options */}
           <div className="mt-4 space-y-2">
             <button
