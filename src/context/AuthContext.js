@@ -70,6 +70,23 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: "LOGOUT" });
   };
 
+  const register = async (email, mobile, password) => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/auth/register", { email, mobile, password });
+      const { user, token } = response.data;
+
+      // Save user and token to localStorage and state
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      dispatch({ type: "LOGIN", payload: { user, token } });
+    } catch (error) {
+      console.error("Registration failed", error);
+      throw error;
+    }
+  };
+
   const refreshToken = async () => {
     try {
       const response = await axios.post("/api/refresh-token", {
@@ -86,7 +103,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ ...state, login, logout, loading }}>
+    <AuthContext.Provider value={{ ...state, login, logout, register, loading }}>
       {children}
     </AuthContext.Provider>
   );
