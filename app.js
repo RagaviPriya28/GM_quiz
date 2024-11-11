@@ -14,7 +14,7 @@ app.use(express.json());
 logger(app); 
 
 app.use('/api/auth', authRoutes);
-app.use('/api', tenantRoutes);
+app.use('/api/Tenants', tenantRoutes);
 app.use('/api', userRoutes); // Use user routes
 
 module.exports = app;
