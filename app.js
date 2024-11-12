@@ -14,7 +14,7 @@ const sessionRoutes = require('./routes/sessionRoutes');
 const answerRoutes = require('./routes/answerRoutes');
 const leaderRoutes = require('./routes/leaderRoutes');
 const qrRoutes = require('./routes/qrRoutes');
-
+const qrCodeRoutes = require('./routes/QrCodeRoutes');
 
 require('./config/env'); 
 
@@ -41,6 +41,6 @@ app.use(answerRoutes);
 app.use(sessionRoutes);
 app.use(leaderRoutes);
 app.use('/api/qr', qrRoutes);
-
+app.use('/api/qrcode', qrCodeRoutes);
 
 module.exports = app;
