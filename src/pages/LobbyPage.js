@@ -1,53 +1,32 @@
-import React from 'react';
+import React, { useContext } from "react";
+import { Navigate } from "react-router-dom"; // Import Navigate for redirection
+import { AuthContext } from "../context/AuthContext";
+import logo from "../assets/gm-admin.png"
 
 export default function LobbyPage() {
+  // Accessing the authentication context
+  const { isAuthenticated, user } = useContext(AuthContext);
+
+  // If the user is not authenticated, redirect them to the login page
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>Quiz Title</h1>
-      </div>
-      <div style={styles.card}>
-        <h4 style={styles.subtitle}>Jaitakshi</h4>
-      </div>
-      <div style={styles.card}>
-        <p style={styles.text}>Please wait till the admin starts the quiz</p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      {/* Quiz Title */}
+      <div className="bg-white p-6 rounded-lg shadow-md text-center">
+        <img src={logo} alt="logo" />
+        {/* User Email */}
+        <div className="text-gray-700 text-sm mb-2">
+          <h4 className="font-semibold">Welcome, {user?.email || "Guest"}</h4>
+        </div>
+
+        {/* Waiting Message */}
+        <div className="text-gray-600 mt-4">
+          <p>Please wait until the admin starts the quiz.</p>
+        </div>
       </div>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-    backgroundColor: '#f4f4f9',
-    gap: '1rem', // Adds space between the cards
-  },
-  card: {
-    backgroundColor: '#ffffff',
-    padding: '1.5rem',
-    borderRadius: '8px',
-    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-    textAlign: 'center',
-    width: '80%',
-    maxWidth: '400px',
-  },
-  title: {
-    fontSize: '2rem',
-    color: '#333',
-    margin: 0,
-  },
-  subtitle: {
-    fontSize: '1.2rem',
-    color: '#777',
-    margin: 0,
-  },
-  text: {
-    fontSize: '1rem',
-    color: '#555',
-    margin: 0,
-  },
-};

@@ -70,9 +70,9 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: "LOGOUT" });
   };
 
-  const register = async (email, mobile, password) => {
+  const register = async (email, mobile, username) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/register", { email, mobile, password });
+      const response = await axios.post("http://localhost:5000/api/auth/register", { email, mobile, username });
       const { user, token } = response.data;
 
       // Save user and token to localStorage and state

@@ -13,9 +13,11 @@ export const RegisterPage = () => {
   // State variables for form inputs and errors
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState();
+  const [username, setUsername] = useState();
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [usernameError, setUsernameError] = useState("");
   const [showPassword, setShowPassword] = useState(false); // New state for password visibility
 
   // Form submit handler with validation
@@ -28,16 +30,21 @@ export const RegisterPage = () => {
       isValid = false;
     }
 
-    if (password.length < 8) {
-      setPasswordError("Password must be at least 8 characters long.");
-      isValid = false;
+    if (!username) {
+      setUsernameError("Please enter a valid username.");
+      isValid = false; // Add this line
     }
+
+    // if (password.length < 8) {
+    //   setPasswordError("Password must be at least 8 characters long.");
+    //   isValid = false;
+    // }
 
     if (isValid) {
       try {
-        await register(email, phone, password); // Call register function from context
+        await register(email, username, phone); // Call register function from context
         console.log("Form submitted successfully");
-        navigate("/login"); // Navigate to the login page after successful registration
+        navigate("/"); // Navigate to the login page after successful registration
       } catch (error) {
         console.error("Registration failed", error);
       }
@@ -96,8 +103,33 @@ export const RegisterPage = () => {
             </p>
           </div>
 
-          {/* Password Input */}
           <div>
+            <label
+              htmlFor="register-username"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Username
+            </label>
+            <input
+              type="text" // Change from type="username" to type="text"
+              id="register-username" // Remove the trailing `]`
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+                setUsernameError("");
+              }}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              placeholder="Enter your user name"
+              aria-label="Username"
+            />
+            {usernameError && (
+              <p className="text-red-600 text-sm">{usernameError}</p>
+            )}
+            <p className="text-sm text-gray-500">Unique user name</p>
+          </div>
+
+          {/* Password Input */}
+          {/* <div>
             <label
               htmlFor="register-password"
               className="block text-sm font-medium text-gray-700"
@@ -134,7 +166,7 @@ export const RegisterPage = () => {
             <p className="text-sm text-gray-500">
               Your password must be at least 8 characters long
             </p>
-          </div>
+          </div> */}
 
           {/* Submit Button */}
           <div>
