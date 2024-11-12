@@ -12,6 +12,7 @@ const slideRoutes = require('./routes/slideRoutes');
 const questionRoutes = require('./routes/questionRoutes');
 const sessionRoutes = require('./routes/sessionRoutes');
 const answerRoutes = require('./routes/answerRoutes');
+const leaderRoutes = require('./routes/leaderRoutes');
 
 require('./config/env'); 
 
@@ -36,5 +37,6 @@ app.use(answerRoutes);
 // app.use('/api/slides', slideRoutes);
 // app.use('/api/questions', questionRoutes);
 app.use(sessionRoutes);
+app.use(leaderRoutes);
 
 module.exports = app;
