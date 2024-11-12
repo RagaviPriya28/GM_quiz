@@ -10,7 +10,7 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const slideRoutes = require('./routes/slideRoutes');
 const questionRoutes = require('./routes/questionRoutes');
-// const sessionRoutes = require('./routes/sessionRoutes');
+const sessionRoutes = require('./routes/sessionRoutes');
 const answerRoutes = require('./routes/answerRoutes');
 
 require('./config/env'); 
@@ -35,6 +35,6 @@ app.use(answerRoutes);
 // app.use('/api/quizzes', quizRoutes);
 // app.use('/api/slides', slideRoutes);
 // app.use('/api/questions', questionRoutes);
-// app.use('/api/sessions', sessionRoutes);
+app.use(sessionRoutes);
 
 module.exports = app;
