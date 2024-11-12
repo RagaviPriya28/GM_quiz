@@ -11,16 +11,16 @@ exports.startSession = async (req, res) => {
     const session = new Session({
       quiz: quizId,
       host: hostId,
-      status: 'in_progress',
+      status: 'waiting',
       startTime: Date.now(),
     });
 
-    // Save session and update the host and players
     const savedSession = await session.save();
 
-    // Add the host to the players array
-    savedSession.players.push(hostId);
-    await savedSession.save();
+    // Notify the lobby (socket emit) that the session has started
+    req.app.get('socketio').to(savedSession._id.toString()).emit('session_started', {
+      sessionId: savedSession._id,
+    });
 
     res.status(201).json(savedSession);
   } catch (error) {
@@ -28,32 +28,25 @@ exports.startSession = async (req, res) => {
   }
 };
 
+
 // End a session and calculate final scores
 exports.endSession = async (req, res) => {
   const { sessionId } = req.params;
 
   try {
-    const session = await Session.findById(sessionId).populate('players');
+    const session = await Session.findById(sessionId);
+    if (session) {
+      session.status = 'completed';
+      session.endTime = Date.now();
+      await session.save();
 
-    if (!session) {
-      return res.status(404).json({ message: 'Session not found' });
+      // Notify users in the session room that the session has ended
+      req.app.get('socketio').to(sessionId).emit('session_ended', { sessionId });
+
+      res.status(200).json(session);
+    } else {
+      res.status(404).json({ message: 'Session not found' });
     }
-
-    if (session.status === 'completed') {
-      return res.status(400).json({ message: 'Session already ended' });
-    }
-
-    // Mark session as completed and record end time
-    session.status = 'completed';
-    session.endTime = Date.now();
-
-    // Calculate final scores
-    const leaderboard = await calculateScores(sessionId);
-    session.leaderboard = leaderboard;
-
-    const updatedSession = await session.save();
-
-    res.status(200).json(updatedSession);
   } catch (error) {
     res.status(500).json({ message: 'Error ending the session', error });
   }
