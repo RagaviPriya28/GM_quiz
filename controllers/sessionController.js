@@ -11,7 +11,7 @@ exports.startSession = async (req, res) => {
     const session = new Session({
       quiz: quizId,
       host: hostId,
-      status: 'waiting',
+      status: 'in_progress',
       startTime: Date.now(),
     });
 
