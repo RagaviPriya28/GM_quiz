@@ -1,9 +1,20 @@
+// Load environment variables from the .env file
+require('dotenv').config();
+
 const QRCode = require('qrcode');
 
 exports.generateQRCode = async (req, res) => {
   try {
-    // URL for registration page (modify as per your app)
-    const registerUrl = 'http://localhost:3000/register';
+    // Get the URL for the registration page from the .env file
+    const registerUrl = process.env.redirectingUrl;
+
+    // Check if the URL is defined in the .env file
+    if (!registerUrl) {
+      return res.status(500).json({
+        success: false,
+        message: 'Registration URL is not defined in the .env file.'
+      });
+    }
 
     // Generate the QR code data URL
     const qrCodeData = await QRCode.toDataURL(registerUrl);
