@@ -116,3 +116,53 @@ const calculateScores = async (sessionId) => {
   leaderboard.sort((a, b) => b.score - a.score); // Sort leaderboard by score descending
   return leaderboard;
 };
+
+
+// User joins a quiz session
+// User joins a quiz session
+exports.joinSession = async (req, res) => {
+    const { sessionId } = req.params;
+    const userId = req.user._id;
+  
+    try {
+      // Find the session by ID
+      const session = await Session.findById(sessionId);
+      if (!session) {
+        return res.status(404).json({ message: 'Session not found' });
+      }
+  
+      // Check if the session is active and allows new participants
+      if (session.status !== 'in_progress') {
+        return res.status(400).json({ message: 'Session is not currently active' });
+      }
+  
+      // Check if the user is already part of the session
+      if (session.players.includes(userId)) {
+        return res.status(400).json({ message: 'User is already part of the session' });
+      }
+  
+      // Add user to the session's players array
+      session.players.push(userId);
+      await session.save();
+  
+      // Calculate the number of players in the session
+      const playerCount = session.players.length;
+  
+      // Notify the session room that a new user has joined (optional)
+      req.app.get('socketio').to(sessionId).emit('user_joined', {
+        sessionId: session._id,
+        userId,
+        playerCount,
+      });
+  
+      res.status(200).json({
+        message: 'User successfully joined the session',
+        session,
+        playerCount,
+      });
+    } catch (error) {
+      res.status(500).json({ message: 'Error joining the session', error });
+    }
+  };
+  
+  

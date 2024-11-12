@@ -6,6 +6,7 @@ const {
   endSession,
   getSessionDetails,
   getLeaderboard,
+  joinSession
 } = require('../controllers/sessionController');
 
 // Start a new session for a quiz (Admin only)
@@ -19,6 +20,10 @@ router.get('/api/sessions/:sessionId', protect, getSessionDetails);
 
 // Get leaderboard information for a session
 router.get('/api/sessions/:sessionId/leaderboard', protect, getLeaderboard);
+
+// User joins an active quiz session
+router.post('/api/sessions/:sessionId/join', protect, joinSession);
+
 
 module.exports = router;
 

@@ -59,4 +59,17 @@ const logout = (req, res) => {
 };
 
 
-module.exports = { register, login, getProfile, logout };
+const listUsers = async (req, res) => {
+  try {
+    // Filter users to return only those with role "user"
+    const users = await User.find({ role: 'user' }).select('-password'); // Exclude passwords from the response
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+
+module.exports = { register, login, getProfile, logout, listUsers };
