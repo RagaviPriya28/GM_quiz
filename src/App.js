@@ -6,6 +6,13 @@ import Home from "./pages/Home";
 import Quiz from "./pages/Quiz";
 import LobbyPage from "./pages/LobbyPage";
 import { AuthContext } from "./context/AuthContext";
+import AdminQuizPage from "./pages/AdminQuizPage";
+import QuestionPageAdmin from "./pages/QuestionPageAdmin";
+
+import QuestionPageUser from "./pages/QuestionPageUser";
+import SurveyScoreboard from "./pages/SurveyScoreboard";
+import QuestionsDetailsAdmin from "./pages/QuestionsDetailsAdmin";
+
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
