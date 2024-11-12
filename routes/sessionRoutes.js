@@ -21,3 +21,5 @@ router.get('/api/sessions/:sessionId', protect, getSessionDetails);
 router.get('/api/sessions/:sessionId/leaderboard', protect, getLeaderboard);
 
 module.exports = router;
+
+
