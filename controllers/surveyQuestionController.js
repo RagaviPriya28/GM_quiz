@@ -53,10 +53,12 @@ exports.getQuestionById = async (req, res) => {
         let question;
         if (userRole === 'admin') {
             question = await SurveyQuestion.findById(id)
-                .select('title description dimension year imageUrl');
+                .select('title description dimension year imageUrl')
+                .populate('imageUrl', 'path'); // Populate path field from Media model
         } else {
             question = await SurveyQuestion.findById(id)
-                .select('title imageUrl answerOptions');
+                .select('title imageUrl answerOptions')
+                .populate('imageUrl', 'path'); // Populate path field from Media model
         }
 
         if (!question) {
@@ -68,3 +70,4 @@ exports.getQuestionById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
