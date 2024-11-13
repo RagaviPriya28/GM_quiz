@@ -16,6 +16,7 @@ const leaderRoutes = require('./routes/leaderRoutes');
 const qrRoutes = require('./routes/qrRoutes');
 const qrCodeRoutes = require('./routes/QrCodeRoutes');
 const mediaRoutes = require('./routes/mediaRoutes');
+const surveyQuestionRoutes = require('./routes/surveyQuestionRoutes');
 
 require('./config/env'); 
 
@@ -44,5 +45,7 @@ app.use(leaderRoutes);
 app.use('/api/qr', qrRoutes);
 app.use('/api/qrcode', qrCodeRoutes);
 app.use('/api/media', mediaRoutes);
+app.use('/api', surveyQuestionRoutes);
+
 
 module.exports = app;

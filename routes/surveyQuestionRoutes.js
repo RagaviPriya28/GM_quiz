@@ -7,7 +7,7 @@ const surveyQuestionController = require('../controllers/surveyQuestionControlle
 router.post('/questions/create', protect, admin, surveyQuestionController.createSurveyQuestion);
 
 // Get all questions
-router.get('/questions', protect, surveyQuestionController.getAllSurveyQuestions);
+router.get('/questions', protect, surveyQuestionController.getAllQuestions);
 
 
 module.exports = router;
