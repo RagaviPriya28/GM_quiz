@@ -34,7 +34,7 @@ exports.getAllQuestions = async (req, res) => {
         }
 
         const questions = await SurveyQuestion.find()
-            .select('title imageUrl answerOptions');
+            .select('title imageUrl answerOptions.optionText');
 
         res.status(200).json(questions);
         
@@ -57,7 +57,7 @@ exports.getQuestionById = async (req, res) => {
                 .populate('imageUrl', 'path'); // Populate path field from Media model
         } else {
             question = await SurveyQuestion.findById(id)
-                .select('title imageUrl answerOptions')
+                .select('title imageUrl answerOptions.optionText')
                 .populate('imageUrl', 'path'); // Populate path field from Media model
         }
 
