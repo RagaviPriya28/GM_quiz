@@ -64,3 +64,21 @@ module.exports = (io) => {
     });
   });
 };
+
+
+
+module.exports = function(io) {
+  io.on('connection', (socket) => {
+    console.log('A user connected:', socket.id);
+
+    socket.on('disconnect', () => {
+      console.log('A user disconnected:', socket.id);
+    });
+
+    // Add custom event handlers if needed, for example:
+    socket.on('someClientEvent', (data) => {
+      console.log('Received data from client:', data);
+      // Handle event
+    });
+  });
+};
