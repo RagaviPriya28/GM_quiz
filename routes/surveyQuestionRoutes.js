@@ -9,5 +9,9 @@ router.post('/questions/create', protect, admin, surveyQuestionController.create
 // Get all questions
 router.get('/questions', protect, surveyQuestionController.getAllQuestions);
 
+// Route to get a survey question by its ID
+router.get('/survey-questions/:id', surveyQuestionController.getQuestionById);
+
 
 module.exports = router;
+    

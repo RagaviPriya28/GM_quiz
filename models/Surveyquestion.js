@@ -18,21 +18,22 @@ const SurveyQuestionSchema = new mongoose.Schema({
         required: true
     },
     imageUrl: {
-        type: String,
-        required: true 
+        type: mongoose.Schema.Types.ObjectId, // Change type to ObjectId
+        ref: 'Media', // Reference the Media model
+        required: true
     },
     timer: {
         type: Number,
-        default: 30 
+        default: 30
     },
     liveScoreboard: {
         correctCount: {
             type: Number,
-            default: 0 
+            default: 0
         },
         incorrectCount: {
             type: Number,
-            default: 0 
+            default: 0
         }
     },
     answerOptions: [
@@ -46,7 +47,7 @@ const SurveyQuestionSchema = new mongoose.Schema({
                 required: true
             }
         }
-    ],
+    ]
 }, {
     timestamps: true
 });
