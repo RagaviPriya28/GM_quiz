@@ -13,4 +13,10 @@ router.post('/register/:qrCodeData', QrCodeController.registerUser);
 // List users registered via a specific QR code
 router.get('/registered-users', protect, admin, QrCodeController.getRegisteredUsers);
 
+// Route for starting the survey, qrCodeData is passed in the URL
+router.post('/start-survey/:qrCodeData', protect, admin, QrCodeController.startSurvey);
+
+// Route for ending the survey, qrCodeData is passed in the URL
+router.post('/end-survey/:qrCodeData', protect, admin, QrCodeController.endSurvey);
+
 module.exports = router;

@@ -6,7 +6,8 @@ const userSchema = new mongoose.Schema({
   phoneNumber: { type: String, required: true },
   userName: { type: String, required: true },
   registeredViaQRCode: { type: Boolean, default: false },
-  qrCodeData: { type: String, required: true }, // New field to store associated QR code data
+  qrCodeData: { type: String, required: true }, 
+  status: { type: String, default: 'waiting in lobby' } 
 }, { timestamps: true });
 
 module.exports = mongoose.model('newUser', userSchema);
