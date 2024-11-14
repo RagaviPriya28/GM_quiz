@@ -60,8 +60,13 @@ module.exports = (io) => {
     //   }
     // });
 
-    socket.on('next_question', async ({ sessionId, questionId }) => {
-      await surveyQuestionController.getNextQuestionSocket(questionId, io, sessionId);
+    socket.on('next_question', async ({ qrCodeData, questionId }) => {
+      await surveyQuestionController.getNextQuestionSocket(questionId, io, qrCodeData);
+    });
+
+    socket.on('timer_update', (data) => {
+      const { countdown } = data;
+      io.emit('timer_update', { countdown });
     });
 
     socket.on('disconnect', () => {
