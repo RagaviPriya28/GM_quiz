@@ -26,36 +26,26 @@ exports.createSurveyQuestion = async (req, res) => {
 exports.getAllQuestions = async (req, res) => {
     try {
         const userRole = req.user ? req.user.role : 'user';
-        const baseUrl = `${req.protocol}://${req.get('host')}/upload/`;
-
-        let questions;
         if (userRole === 'admin') {
-            questions = await SurveyQuestion.find()
-                .select('title description dimension year imageUrl')
-                .populate('imageUrl', 'path');
-        } else {
-            questions = await SurveyQuestion.find()
-                .select('title imageUrl answerOptions.optionText')
-                .populate('imageUrl', 'path');
+            const questions = await SurveyQuestion.find()
+                .select('title description dimension year imageUrl timer'); 
+
+            return res.status(200).json(questions);
         }
 
-        // Construct full URLs for imageUrl in each question
-        questions = questions.map(question => {
-            if (question.imageUrl && question.imageUrl.path) {
-                const filename = question.imageUrl.path.split('\\').pop();
-                question.imageUrl = `${baseUrl}${filename}`;
-            }
-            return question;
-        });
+        const questions = await SurveyQuestion.find()
+            .select('title imageUrl answerOptions.optionText timer');
 
         res.status(200).json(questions);
+        
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
+
 // Get a specific survey question by ID
-exports.getQuestionById = async (req, res, io, sessionId) => {
+exports.getQuestionById = async (req, res) => {
     try {
         const { id } = req.params;
         const userRole = req.user ? req.user.role : 'user';
@@ -64,12 +54,12 @@ exports.getQuestionById = async (req, res, io, sessionId) => {
         let question;
         if (userRole === 'admin') {
             question = await SurveyQuestion.findById(id)
-                .select('title description dimension year imageUrl')
-                .populate('imageUrl', 'path');
+                .select('title description dimension year imageUrl timer')
+                .populate('imageUrl', 'path'); // Populate path field from Media model
         } else {
             question = await SurveyQuestion.findById(id)
-                .select('title imageUrl answerOptions.optionText')
-                .populate('imageUrl', 'path');
+                .select('title imageUrl answerOptions.optionText timer')
+                .populate('imageUrl', 'path'); // Populate path field from Media model
         }
 
         if (!question) {
@@ -78,22 +68,16 @@ exports.getQuestionById = async (req, res, io, sessionId) => {
 
         // Construct the full URL for imageUrl if it's populated
         if (question.imageUrl && question.imageUrl.path) {
-            const filename = question.imageUrl.path.split('\\').pop();
-            question.imageUrl = `${baseUrl}${filename}`;
+            question.imageUrl = `${baseUrl}${question.imageUrl.path.split('\\').pop()}`;
         }
 
-        // Emit the question via socket if io and sessionId are provided
-        if (io && sessionId) {
-            io.to(sessionId).emit('new_question', question);
-        }
-
-        // Send the question as an HTTP response
         res.status(200).json(question);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
-// Handle sending the next survey question over sockets
+
+
 exports.getNextQuestionSocket = async (questionId, io, sessionId) => {
     try {
         const question = await SurveyQuestion.findById(questionId);
@@ -106,4 +90,3 @@ exports.getNextQuestionSocket = async (questionId, io, sessionId) => {
         console.error('Error sending survey question:', error);
     }
 };
-
