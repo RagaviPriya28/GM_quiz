@@ -26,18 +26,29 @@ exports.createSurveyQuestion = async (req, res) => {
 exports.getAllQuestions = async (req, res) => {
     try {
         const userRole = req.user ? req.user.role : 'user';
-        if (userRole === 'admin') {
-            const questions = await SurveyQuestion.find()
-                .select('title description dimension year imageUrl'); 
+        const baseUrl = `${req.protocol}://${req.get('host')}/upload/`;
 
-            return res.status(200).json(questions);
+        let questions;
+        if (userRole === 'admin') {
+            questions = await SurveyQuestion.find()
+                .select('title description dimension year imageUrl')
+                .populate('imageUrl', 'path');
+        } else {
+            questions = await SurveyQuestion.find()
+                .select('title imageUrl answerOptions.optionText')
+                .populate('imageUrl', 'path');
         }
 
-        const questions = await SurveyQuestion.find()
-            .select('title imageUrl answerOptions.optionText');
+        // Construct full URLs for imageUrl in each question
+        questions = questions.map(question => {
+            if (question.imageUrl && question.imageUrl.path) {
+                const filename = question.imageUrl.path.split('\\').pop();
+                question.imageUrl = `${baseUrl}${filename}`;
+            }
+            return question;
+        });
 
         res.status(200).json(questions);
-        
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
