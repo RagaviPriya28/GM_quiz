@@ -88,7 +88,7 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
         
         <Route path="/register/:qrCodeData" element={<Registration />} />
-        <Route path="/question/page/admin" element={<QuestionPageAdmin />} />
+        <Route path="/question/admin" element={<QuestionPageAdmin />} />
         
         {/* Protect the / route with ProtectedRoute */}
         <Route path="/" element={<ProtectedRoute />} />
