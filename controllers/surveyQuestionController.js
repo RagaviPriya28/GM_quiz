@@ -29,7 +29,7 @@ exports.getAllQuestions = async (req, res) => {
         let questions;
 
         if (userRole === 'admin') {
-            questions = await SurveyQuestion.find().select('title description dimension year imageUrl timer');
+            questions = await SurveyQuestion.find().select('title description dimension year imageUrl timer liveScoreboard');
         } else {
             questions = await SurveyQuestion.find().select('title imageUrl answerOptions.optionText timer');
         }
@@ -58,7 +58,7 @@ exports.getQuestionById = async (req, res) => {
         let question;
         if (userRole === 'admin') {
             question = await SurveyQuestion.findById(id)
-                .select('title description dimension year imageUrl timer')
+                .select('title description dimension year imageUrl timer liveScoreboard')
                 .populate('imageUrl', 'path'); // Populate path field from Media model
         } else {
             question = await SurveyQuestion.findById(id)
