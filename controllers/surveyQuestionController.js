@@ -49,20 +49,27 @@ exports.getQuestionById = async (req, res) => {
     try {
         const { id } = req.params;
         const userRole = req.user ? req.user.role : 'user';
+        const baseUrl = `${req.protocol}://${req.get('host')}/upload/`;
 
         let question;
         if (userRole === 'admin') {
             question = await SurveyQuestion.findById(id)
                 .select('title description dimension year imageUrl')
-                .populate('imageUrl', 'path'); // Populate path field from Media model
+                .populate('imageUrl', 'path');
         } else {
             question = await SurveyQuestion.findById(id)
                 .select('title imageUrl answerOptions.optionText')
-                .populate('imageUrl', 'path'); // Populate path field from Media model
+                .populate('imageUrl', 'path');
         }
 
         if (!question) {
             return res.status(404).json({ message: 'Survey question not found' });
+        }
+
+        // Construct the full URL for imageUrl if it's populated
+        if (question.imageUrl && question.imageUrl.path) {
+            const filename = question.imageUrl.path.split('\\').pop();
+            question.imageUrl = `${baseUrl}${filename}`;
         }
 
         res.status(200).json(question);
@@ -70,4 +77,6 @@ exports.getQuestionById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+
 

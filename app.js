@@ -18,6 +18,9 @@ const qrCodeRoutes = require('./routes/QrCodeRoutes');
 const mediaRoutes = require('./routes/mediaRoutes');
 const surveyQuestionRoutes = require('./routes/surveyQuestionRoutes');
 
+
+const path = require('path');
+
 require('./config/env'); 
 
 const app = express();
@@ -47,5 +50,6 @@ app.use('/api/qrcode', qrCodeRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api', surveyQuestionRoutes);
 
+app.use('/upload', express.static(path.join(__dirname, '')));
 
 module.exports = app;
