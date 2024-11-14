@@ -300,7 +300,7 @@ const AdminQuizPage = () => {
       }
 
       
-      navigate('question/page/admin');
+      navigate('/question/admin');
     } catch (error) {
       console.error('Error starting quiz:', error);
       setError('Failed to start quiz. Please try again.');
@@ -312,7 +312,7 @@ const AdminQuizPage = () => {
   useEffect(() => {
     const generateQrCode = async () => {
       try {
-        const response = await fetch('${API_BASE_URL}/api/qrcode/generate', {
+        const response = await fetch(`${API_BASE_URL}/api/qrcode/generate`, {
           method: 'GET',
           headers: getAuthHeaders()
         });

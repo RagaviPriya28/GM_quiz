@@ -64,7 +64,7 @@ const LobbyPage = () => {
             setQuizStatus('in-progress');
             setIsRedirecting(true);
             setTimeout(() => {
-              navigate('/question/page/user', { 
+              navigate('/question/user', { 
                 state: { 
                   email: userEmail,
                   qrCodeData,
@@ -140,7 +140,7 @@ const LobbyPage = () => {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
         <div className="flex justify-center mb-8">
-          <img src={logo} alt="Quiz Logo" className="h-16" />
+          <img src={logo} alt="Quiz Logo" className="mb-4" />
         </div>
 
         <div className="text-center mb-8">
@@ -183,3 +183,4 @@ const LobbyPage = () => {
 };
 
 export default LobbyPage;
+

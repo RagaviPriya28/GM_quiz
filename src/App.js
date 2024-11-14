@@ -55,6 +55,7 @@ import WebSocketClient from "./Socket/SocketClient";
 import LobbyPage from "./pages/LobbyPage";
 import Registration from "./pages/Registration";
 import QuestionPageAdmin from "./pages/QuestionPageAdmin";
+import QuestionPageUser from "./pages/QuestionPageUser";
 
 // ProtectedRoute component for role-based access
 const ProtectedRoute = () => {
@@ -89,6 +90,7 @@ export default function App() {
         
         <Route path="/register/:qrCodeData" element={<Registration />} />
         <Route path="/question/admin" element={<QuestionPageAdmin />} />
+        <Route path="/question/user" element={<QuestionPageUser />} />
         
         {/* Protect the / route with ProtectedRoute */}
         <Route path="/" element={<ProtectedRoute />} />
