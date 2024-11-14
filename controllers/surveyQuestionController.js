@@ -28,7 +28,7 @@ exports.getAllQuestions = async (req, res) => {
         const userRole = req.user ? req.user.role : 'user';
         if (userRole === 'admin') {
             const questions = await SurveyQuestion.find()
-                .select('title description dimension year imageUrl timer'); 
+                .select('title description dimension year imageUrl timer liveScoreboard'); 
 
             return res.status(200).json(questions);
         }
@@ -54,7 +54,7 @@ exports.getQuestionById = async (req, res) => {
         let question;
         if (userRole === 'admin') {
             question = await SurveyQuestion.findById(id)
-                .select('title description dimension year imageUrl timer')
+                .select('title description dimension year imageUrl timer liveScoreboard')
                 .populate('imageUrl', 'path'); // Populate path field from Media model
         } else {
             question = await SurveyQuestion.findById(id)
