@@ -54,9 +54,8 @@ exports.getAllQuestions = async (req, res) => {
     }
 };
 
-
 // Get a specific survey question by ID
-exports.getQuestionById = async (req, res) => {
+exports.getQuestionById = async (req, res, io, sessionId) => {
     try {
         const { id } = req.params;
         const userRole = req.user ? req.user.role : 'user';
@@ -83,11 +82,28 @@ exports.getQuestionById = async (req, res) => {
             question.imageUrl = `${baseUrl}${filename}`;
         }
 
+        // Emit the question via socket if io and sessionId are provided
+        if (io && sessionId) {
+            io.to(sessionId).emit('new_question', question);
+        }
+
+        // Send the question as an HTTP response
         res.status(200).json(question);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
-
-
+// Handle sending the next survey question over sockets
+exports.getNextQuestionSocket = async (questionId, io, sessionId) => {
+    try {
+        const question = await SurveyQuestion.findById(questionId);
+        if (question) {
+            io.to(sessionId).emit('new_question', question);
+        } else {
+            console.error('Survey question not found');
+        }
+    } catch (error) {
+        console.error('Error sending survey question:', error);
+    }
+};
 

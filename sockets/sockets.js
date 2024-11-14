@@ -1,5 +1,6 @@
 const Session = require('../models/session');
 const Question = require('../models/question');
+const surveyQuestionController = require('../controllers/surveyQuestionController');
 
 module.exports = (io) => {
   io.on('connection', (socket) => {
@@ -45,18 +46,22 @@ module.exports = (io) => {
       }
     });
 
+    // socket.on('next_question', async ({ sessionId, questionId }) => {
+    //   try {
+    //     const question = await Question.findById(questionId);
+    //     if (question) {
+    //       io.to(sessionId).emit('new_question', question);
+    //     } else {
+    //       socket.emit('error', 'Question not found');
+    //     }
+    //   } catch (error) {
+    //     console.error('Error sending question:', error);
+    //     socket.emit('error', 'Error sending question');
+    //   }
+    // });
+
     socket.on('next_question', async ({ sessionId, questionId }) => {
-      try {
-        const question = await Question.findById(questionId);
-        if (question) {
-          io.to(sessionId).emit('new_question', question);
-        } else {
-          socket.emit('error', 'Question not found');
-        }
-      } catch (error) {
-        console.error('Error sending question:', error);
-        socket.emit('error', 'Error sending question');
-      }
+      await surveyQuestionController.getNextQuestionSocket(questionId, io, sessionId);
     });
 
     socket.on('disconnect', () => {
