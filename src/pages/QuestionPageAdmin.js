@@ -154,7 +154,7 @@ export default function QuestionPageAdmin() {
           </div>
           <div className="mt-6">
             <p className="text-lg font-medium text-gray-800">
-              Timer: {currentQuestion?.timer}:00
+              Timer: {currentQuestion?.timer}
             </p>
           </div>
         </div>
