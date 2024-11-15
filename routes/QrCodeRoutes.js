@@ -11,7 +11,7 @@ router.get('/generate', protect, admin, QrCodeController.generateQrCode);
 router.post('/register/:qrCodeData', QrCodeController.registerUser);
 
 // List users registered via a specific QR code
-router.get('/registered-users', protect, admin, QrCodeController.getRegisteredUsers);
+router.get('/registered-users', QrCodeController.getRegisteredUsers);
 
 // Route for starting the survey, qrCodeData is passed in the URL
 router.post('/start-survey/:qrCodeData', protect, admin, QrCodeController.startSurvey);
