@@ -248,7 +248,7 @@ exports.changeQuestionByQr = async (req, res) => {
         const io = req.app.get('socketio');
 
         const question = await SurveyQuestion.findById(questionId)
-            .select('title imageUrl answerOptions.optionText timer');
+            .select('title description dimension year imageUrl timer liveScoreboard');
 
         if (!question) {
             return res.status(404).json({ message: 'Question not found' });
