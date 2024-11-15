@@ -72,12 +72,14 @@ export default function QuestionPageAdmin() {
       const data = await response.json();
 
       // Construct the image URL if it exists
-      if (data.imageUrl) {
-        const imagePath = `${API_BASE_URL}/upload/${data.imageUrl.path.replace(
+      if (data.imageUrl && data.imageUrl.path) {
+        const imagePath = `${API_BASE_URL}/uploads/${data.imageUrl.path.replace(
           /\\/g,
           "/"
         )}`;
         data.imageUrl = imagePath; // Update the imageUrl with the correct path
+      } else {
+        console.warn("Image URL or path is missing");
       }
 
       setCurrentQuestion(data);
