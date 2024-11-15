@@ -120,59 +120,117 @@
 
 
 
-
 const SurveyQuestion = require('../models/Surveyquestion');
 
 // Store active QR sessions
 const activeQrSessions = new Map();
 
+// Helper function to construct image URL
+const constructImageUrl = (baseUrl, imageUrl) => {
+    if (!imageUrl || !imageUrl.path) {
+        return null;
+    }
+    try {
+        // Handle both Windows and Unix-style paths
+        const filename = imageUrl.path.split(/[/\\]/).pop();
+        return `${baseUrl}${filename}`;
+    } catch (error) {
+        console.error('Error constructing image URL:', error);
+        return null;
+    }
+};
+
+// Helper function to process question object
+const processQuestionObject = (question, baseUrl) => {
+    if (!question) return null;
+    
+    const questionObj = question.toObject();
+    questionObj.imageUrl = constructImageUrl(baseUrl, questionObj.imageUrl);
+    return questionObj;
+};
+
 // Get all public questions
 exports.getPublicQuestions = async (req, res) => {
     try {
+        const baseUrl = `${req.protocol}://${req.get('host')}/uploads/`;
+        
         const questions = await SurveyQuestion.find()
-            .select('title imageUrl answerOptions.optionText timer');
-        res.status(200).json(questions);
+            .select('title imageUrl answerOptions.optionText timer')
+            .populate('imageUrl', 'path')
+            .lean();  // Use lean() for better performance
+        
+        if (!questions || !Array.isArray(questions)) {
+            return res.status(404).json({ message: 'No questions found' });
+        }
+
+        const questionsWithImageUrls = questions.map(question => 
+            processQuestionObject(question, baseUrl)
+        ).filter(Boolean);  // Remove any null results
+        
+        res.status(200).json(questionsWithImageUrls);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error in getPublicQuestions:', error);
+        res.status(500).json({ 
+            message: 'Failed to fetch questions',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 
 // Get public question by ID
 exports.getPublicQuestionById = async (req, res) => {
     try {
+        const baseUrl = `${req.protocol}://${req.get('host')}/uploads/`;
+        
         const question = await SurveyQuestion.findById(req.params.id)
-            .select('title imageUrl answerOptions.optionText timer');
+            .select('title imageUrl answerOptions.optionText timer')
+            .populate('imageUrl', 'path')
+            .lean();
+            
         if (!question) {
             return res.status(404).json({ message: 'Question not found' });
         }
-        res.status(200).json(question);
+
+        const processedQuestion = processQuestionObject(question, baseUrl);
+        if (!processedQuestion) {
+            return res.status(404).json({ message: 'Error processing question data' });
+        }
+
+        res.status(200).json(processedQuestion);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error in getPublicQuestionById:', error);
+        res.status(500).json({ 
+            message: 'Failed to fetch question',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 
 // Get all admin questions
 exports.getAdminQuestions = async (req, res) => {
     try {
+        const baseUrl = `${req.protocol}://${req.get('host')}/uploads/`;
+        
         const questions = await SurveyQuestion.find()
-            .select('title description dimension year imageUrl timer liveScoreboard');
-        res.status(200).json(questions);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
+            .select('title description dimension year imageUrl timer liveScoreboard')
+            .populate('imageUrl', 'path')
+            .lean();
 
-// Get admin question by ID
-exports.getAdminQuestionById = async (req, res) => {
-    try {
-        const question = await SurveyQuestion.findById(req.params.id)
-            .select('title description dimension year imageUrl timer liveScoreboard');
-        if (!question) {
-            return res.status(404).json({ message: 'Question not found' });
+        if (!questions || !Array.isArray(questions)) {
+            return res.status(404).json({ message: 'No questions found' });
         }
-        res.status(200).json(question);
+
+        const questionsWithImageUrls = questions.map(question => 
+            processQuestionObject(question, baseUrl)
+        ).filter(Boolean);
+
+        res.status(200).json(questionsWithImageUrls);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error in getAdminQuestions:', error);
+        res.status(500).json({ 
+            message: 'Failed to fetch admin questions',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 
@@ -180,6 +238,14 @@ exports.getAdminQuestionById = async (req, res) => {
 exports.createSurveyQuestion = async (req, res) => {
     try {
         const { title, description, dimension, year, imageUrl, answerOptions, timer } = req.body;
+        
+        // Validate required fields
+        if (!title || !answerOptions || !Array.isArray(answerOptions)) {
+            return res.status(400).json({ 
+                message: 'Missing required fields: title and answerOptions array' 
+            });
+        }
+
         const newQuestion = new SurveyQuestion({
             title,
             description,
@@ -189,10 +255,50 @@ exports.createSurveyQuestion = async (req, res) => {
             answerOptions,
             timer: timer || 30
         });
+
         const savedQuestion = await newQuestion.save();
-        res.status(201).json(savedQuestion);
+        
+        // Populate imageUrl after saving
+        await savedQuestion.populate('imageUrl', 'path');
+        
+        const baseUrl = `${req.protocol}://${req.get('host')}/uploads/`;
+        const processedQuestion = processQuestionObject(savedQuestion, baseUrl);
+
+        res.status(201).json(processedQuestion);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error in createSurveyQuestion:', error);
+        res.status(500).json({ 
+            message: 'Failed to create question',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+};
+
+exports.getAdminQuestionById = async (req, res) => {
+    try {
+        const baseUrl = `${req.protocol}://${req.get('host')}/uploads/`;
+        
+        const question = await SurveyQuestion.findById(req.params.id)
+            .select('title description dimension year imageUrl timer liveScoreboard')
+            .populate('imageUrl', 'path')
+            .lean();
+            
+        if (!question) {
+            return res.status(404).json({ message: 'Question not found' });
+        }
+
+        const processedQuestion = processQuestionObject(question, baseUrl);
+        if (!processedQuestion) {
+            return res.status(404).json({ message: 'Error processing question data' });
+        }
+
+        res.status(200).json(processedQuestion);
+    } catch (error) {
+        console.error('Error in getAdminQuestionById:', error);
+        res.status(500).json({ 
+            message: 'Failed to fetch question',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 
@@ -202,14 +308,12 @@ exports.initializeQrSession = async (req, res) => {
         const { qrCodeId } = req.params;
         const io = req.app.get('socketio');
 
-        // Initialize session if it doesn't exist
         if (!activeQrSessions.has(qrCodeId)) {
             activeQrSessions.set(qrCodeId, {
                 currentQuestionId: null,
                 timer: null
             });
             
-            // Create socket room for this QR code
             io.on('connection', (socket) => {
                 socket.join(qrCodeId);
                 socket.emit('session_initialized', { qrCodeId });
@@ -227,15 +331,22 @@ exports.getCurrentQuestionByQr = async (req, res) => {
     try {
         const { qrCodeId } = req.params;
         const session = activeQrSessions.get(qrCodeId);
+        const baseUrl = `${req.protocol}://${req.get('host')}/uploads/`;
 
         if (!session || !session.currentQuestionId) {
             return res.status(404).json({ message: 'No active question for this session' });
         }
 
         const question = await SurveyQuestion.findById(session.currentQuestionId)
-            .select('title imageUrl answerOptions.optionText timer');
+            .select('title imageUrl answerOptions.optionText timer')
+            .populate('imageUrl', 'path');
 
-        res.status(200).json(question);
+        const questionObj = question.toObject();
+        if (questionObj.imageUrl && questionObj.imageUrl.path) {
+            questionObj.imageUrl = `${baseUrl}${questionObj.imageUrl.path.split('\\').pop()}`;
+        }
+
+        res.status(200).json(questionObj);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -246,31 +357,34 @@ exports.changeQuestionByQr = async (req, res) => {
     try {
         const { qrCodeId, questionId } = req.params;
         const io = req.app.get('socketio');
+        const baseUrl = `${req.protocol}://${req.get('host')}/uploads/`;
 
         const question = await SurveyQuestion.findById(questionId)
-            .select('title description dimension year imageUrl timer liveScoreboard');
+            .select('title description dimension year imageUrl timer liveScoreboard')
+            .populate('imageUrl', 'path');
 
         if (!question) {
             return res.status(404).json({ message: 'Question not found' });
         }
 
-        // Update session
+        const questionObj = question.toObject();
+        if (questionObj.imageUrl && questionObj.imageUrl.path) {
+            questionObj.imageUrl = `${baseUrl}${questionObj.imageUrl.path.split('\\').pop()}`;
+        }
+
         let session = activeQrSessions.get(qrCodeId);
         if (!session) {
             session = { currentQuestionId: null, timer: null };
             activeQrSessions.set(qrCodeId, session);
         }
 
-        // Clear existing timer
         if (session.timer) {
             clearInterval(session.timer);
         }
 
-        // Set new question
         session.currentQuestionId = questionId;
 
-        // Start timer
-        let countdown = question.timer || 30;
+        let countdown = questionObj.timer || 30;
         session.timer = setInterval(() => {
             countdown--;
             io.to(qrCodeId).emit('timer_update', { countdown });
@@ -281,10 +395,9 @@ exports.changeQuestionByQr = async (req, res) => {
             }
         }, 1000);
 
-        // Emit new question to room
-        io.to(qrCodeId).emit('question_changed', { question });
+        io.to(qrCodeId).emit('question_changed', { question: questionObj });
 
-        res.status(200).json({ message: 'Question changed successfully', question });
+        res.status(200).json({ message: 'Question changed successfully', question: questionObj });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

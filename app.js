@@ -50,6 +50,6 @@ app.use('/api/qrcode', qrCodeRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api', surveyQuestionRoutes);
 
-app.use('/upload', express.static(path.join(__dirname, '')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 module.exports = app;
