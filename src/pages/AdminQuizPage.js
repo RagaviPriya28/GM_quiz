@@ -300,7 +300,7 @@ const AdminQuizPage = () => {
       }
 
       
-      navigate('/question/admin');
+      navigate('/question/page/admin');
     } catch (error) {
       console.error('Error starting quiz:', error);
       setError('Failed to start quiz. Please try again.');
@@ -309,40 +309,44 @@ const AdminQuizPage = () => {
     }
   };
 
-  useEffect(() => {
-    const generateQrCode = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/qrcode/generate`, {
-          method: 'GET',
-          headers: getAuthHeaders()
-        });
-        
-        if (response.status === 401) {
-          handleUnauthorized();
-          return;
+    useEffect(() => {
+      const generateQrCode = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/qrcode/generate`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+          });
+          
+          if (response.status === 401) {
+            handleUnauthorized();
+            return;
+          }
+          
+          if (!response.ok) {
+            throw new Error('Failed to generate QR code');
+          }
+          
+          const data = await response.json();
+          const qrData = data.qrCodeData || `quiz-${Date.now()}`;
+          setQrCodeData(qrData);
+  
+          // Store qrCodeData in localStorage
+          localStorage.setItem('qrCodeData', qrData);
+  
+        } catch (error) {
+          console.error('Error generating QR code:', error);
+          setError('Failed to generate QR code');
+          const fallbackQrData = `quiz-${Date.now()}`;
+          setQrCodeData(fallbackQrData);
+          localStorage.setItem('qrCodeData', fallbackQrData); // Store fallback data if generation fails
+        } finally {
+          setQrLoading(false);
         }
-        
-        if (!response.ok) {
-          throw new Error('Failed to generate QR code');
-        }
-        
-        const data = await response.json();
-        if (data.qrCodeData) {
-          setQrCodeData(data.qrCodeData);
-        } else {
-          setQrCodeData(`quiz-${Date.now()}`);
-        }
-      } catch (error) {
-        console.error('Error generating QR code:', error);
-        setError('Failed to generate QR code');
-        setQrCodeData(`quiz-${Date.now()}`);
-      } finally {
-        setQrLoading(false);
-      }
-    };
-
-    generateQrCode();
-  }, [navigate]);
+      };
+  
+      generateQrCode();
+    }, [navigate]);
+  
 
   useEffect(() => {
     const fetchRegisteredUsers = async () => {

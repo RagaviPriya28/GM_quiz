@@ -44,7 +44,6 @@
 //   );
 // }
 
-
 import React, { useContext } from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import { LoginPage } from "./pages/LoginPage";
@@ -87,15 +86,14 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        
+
         <Route path="/register/:qrCodeData" element={<Registration />} />
-        <Route path="/question/admin" element={<QuestionPageAdmin />} />
+        <Route path="/question/page/admin" element={<QuestionPageAdmin />} />
         <Route path="/question/user" element={<QuestionPageUser />} />
-        
+
         {/* Protect the / route with ProtectedRoute */}
         <Route path="/" element={<ProtectedRoute />} />
         <Route path="/lobby" element={<LobbyPage />} />
-        
       </Routes>
     </>
   );
