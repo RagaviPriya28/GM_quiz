@@ -205,6 +205,8 @@ export default function RegisterPage() {
         console.log("Registration successful:", data);
 
         // Save necessary data to localStorage
+        const user=data.user
+        localStorage.setItem("userId",user._id)
         localStorage.setItem("userEmail", email);
         localStorage.setItem("qrCodeData", qrCodeData);
         localStorage.setItem("userName", username);
