@@ -326,6 +326,7 @@ exports.submitAnswer = async (req, res) => {
     try {
         const { qrCodeId, questionId, userId } = req.params;
         const { answerText, timeTaken } = req.body;
+        const io = req.io; // Access the socket.io instance
 
         // Validate input
         if (!answerText) {
@@ -372,6 +373,25 @@ exports.submitAnswer = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
+
+        // Emit real-time event to clients when a user clicks an answer
+        io.emit('answerClicked', {
+            userId,
+            questionId,
+            qrCodeId,
+            answerText,
+            timeTaken
+        });
+
+        // Emit final submission event to clients
+        io.emit('answerSubmitted', {
+            questionId: questionId,
+            qrCodeId: qrCodeId,
+            userId: userId,
+            userName: user.userName,
+            submittedAnswer: answerText,
+            timeTaken: timeTaken
+        });
 
         // Send the response
         res.status(200).json({

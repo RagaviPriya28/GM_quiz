@@ -60,9 +60,9 @@ module.exports = (io) => {
     //   }
     // });
 
-    socket.on('next_question', async ({ qrCodeData, questionId }) => {
-      await surveyQuestionController.getNextQuestionSocket(questionId, io, qrCodeData);
-    });
+    // socket.on('next_question', async ({ qrCodeData, questionId }) => {
+    //   await surveyQuestionController.getNextQuestionSocket(questionId, io, qrCodeData);
+    // });
 
     socket.on('timer_update', (data) => {
       const { countdown } = data;
@@ -84,6 +84,11 @@ module.exports = function(io) {
     socket.on('disconnect', () => {
       console.log('A user disconnected:', socket.id);
     });
+
+    socket.on('clickAnswer', (data) => {
+      console.log('Answer clicked:', data);
+      io.emit('answerClicked', data);
+  });
 
     // Add custom event handlers if needed, for example:
     socket.on('someClientEvent', (data) => {
