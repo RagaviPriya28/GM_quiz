@@ -27,7 +27,10 @@ const {
     getCurrentQuestionByQr,
     changeQuestionByQr,
     initializeQrSession,
-    endQrSession
+    endQrSession,
+    submitAnswer,
+    getAnswerCountsWithUserDetails,
+    getTotalCountsForAllQuestions
 } = require('../controllers/surveyQuestionController');
 
 // Public routes (no authentication needed)
@@ -46,6 +49,16 @@ router.post('/qr/:qrCodeId/end', protect, admin, endQrSession);
 router.post('/questions/create', protect, admin, createSurveyQuestion);
 router.get('/admin/questions', protect, admin, getAdminQuestions);
 router.get('/admin/questions/:id', protect, admin, getAdminQuestionById);
+
+// Define the route for submitting an answer
+router.post('/submit-answer/:qrCodeId/:questionId/:userId', submitAnswer);
+
+// Route for getting counts and user details per question
+router.get('/getting-count/:qrCodeId/:questionId', protect, admin, getAnswerCountsWithUserDetails);
+
+// Route for getting total counts and user details for all question
+router.get('/getting-total-counts/:qrCodeData', protect, admin, getTotalCountsForAllQuestions);
+
 
 module.exports = router;
     

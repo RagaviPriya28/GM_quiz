@@ -122,6 +122,9 @@
 
 
 const SurveyQuestion = require('../models/Surveyquestion');
+const AnswerSubmission = require('../models/AnswerSubmission'); 
+const User = require('../models/newUser');
+const AnswerCounts = require('../models/AnswerCounts');
 
 // Store active QR sessions
 const activeQrSessions = new Map();
@@ -319,3 +322,267 @@ exports.endQrSession = async (req, res) => {
     }
 };
 
+exports.submitAnswer = async (req, res) => {
+    try {
+        const { qrCodeId, questionId, userId } = req.params;
+        const { answerText, timeTaken } = req.body;
+
+        // Validate input
+        if (!answerText) {
+            return res.status(400).json({ message: 'Answer text is required' });
+        }
+        if (typeof timeTaken !== 'number' || timeTaken < 0) {
+            return res.status(400).json({ message: 'Valid timeTaken value is required' });
+        }
+
+        // Check if the user has already submitted an answer for this question
+        const existingSubmission = await AnswerSubmission.findOne({ userId, questionId });
+        if (existingSubmission) {
+            return res.status(400).json({ message: 'You have already submitted an answer for this question' });
+        }
+
+        // Fetch the question
+        const question = await SurveyQuestion.findById(questionId).select('answerOptions');
+
+        if (!question) {
+            return res.status(404).json({ message: 'Question not found' });
+        }
+
+        // Validate the answer
+        const isValidAnswer = question.answerOptions.some(option => option.optionText === answerText);
+
+        if (!isValidAnswer) {
+            return res.status(400).json({ message: 'Invalid answer option' });
+        }
+
+        // Save the submission with time taken
+        const submission = new AnswerSubmission({
+            userId: userId,
+            questionId: questionId,
+            qrCodeId: qrCodeId,
+            submittedAnswer: answerText,
+            submittedAt: new Date(),
+            timeTaken: timeTaken // Storing the time taken for submission
+        });
+
+        await submission.save();
+
+        // Fetch user details
+        const user = await User.findById(userId).select('userName phoneNumber email');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Send the response
+        res.status(200).json({
+            message: 'Answer submitted successfully',
+            data: {
+                questionId: questionId,
+                qrCodeId: qrCodeId,
+                userId: userId,
+                userName: user.userName,
+                phoneNumber: user.phoneNumber,
+                email: user.email,
+                timeTaken: timeTaken
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+exports.getAnswerCountsWithUserDetails = async (req, res) => {
+    try {
+        const { qrCodeId, questionId } = req.params;
+
+        // Fetch the question to get available options
+        const question = await SurveyQuestion.findById(questionId).select('answerOptions');
+        if (!question) {
+            return res.status(404).json({ message: 'Question not found' });
+        }
+
+        // Count submissions and gather user details for each answer option
+        const submissions = await AnswerSubmission.find({ questionId: questionId, qrCodeId: qrCodeId })
+            .populate('userId', 'userName phoneNumber email');
+
+        // Prepare the response with counts and user details
+        const response = {};
+        question.answerOptions.forEach(option => {
+            // Filter submissions for the current option
+            const optionSubmissions = submissions.filter(sub => sub.submittedAnswer === option.optionText);
+            
+            // Count the number of submissions for this option
+            response[option.optionText] = {
+                count: optionSubmissions.length,
+                users: optionSubmissions.map(sub => ({
+                    userId: sub.userId._id,
+                    userName: sub.userId.userName,
+                    phoneNumber: sub.userId.phoneNumber,
+                    email: sub.userId.email,
+                    submittedAt: sub.submittedAt,
+                    timeTaken: sub.timeTaken
+                }))
+            };
+        });
+
+        res.status(200).json({
+            message: 'Counts and user details retrieved successfully',
+            questionId: questionId,
+            qrCodeId: qrCodeId,
+            data: response
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getAnswerCountsWithUserDetails = async (req, res) => {
+    try {
+        const { qrCodeId, questionId } = req.params;
+
+        // Fetch the question to get available options
+        const question = await SurveyQuestion.findById(questionId).select('answerOptions');
+        if (!question) {
+            return res.status(404).json({ message: 'Question not found' });
+        }
+
+        // Count submissions and gather user details for each answer option
+        const submissions = await AnswerSubmission.find({ questionId: questionId, qrCodeId: qrCodeId })
+            .populate('userId', 'userName phoneNumber email');
+
+        // Prepare the response with counts and user details
+        const response = {};
+        const countsData = [];
+        question.answerOptions.forEach(option => {
+            // Filter submissions for the current option
+            const optionSubmissions = submissions.filter(sub => sub.submittedAnswer === option.optionText);
+            
+            // Count the number of submissions for this option
+            const count = optionSubmissions.length;
+            response[option.optionText] = {
+                count: count,
+                users: optionSubmissions.map(sub => ({
+                    userId: sub.userId._id,
+                    userName: sub.userId.userName,
+                    phoneNumber: sub.userId.phoneNumber,
+                    email: sub.userId.email,
+                    submittedAt: sub.submittedAt,
+                    timeTaken: sub.timeTaken
+                }))
+            };
+
+            // Prepare data for saving counts
+            countsData.push({ optionText: option.optionText, count: count });
+        });
+
+        // Save counts data to the database
+        const existingCounts = await AnswerCounts.findOne({ qrCodeId: qrCodeId, questionId: questionId });
+        if (existingCounts) {
+            // If counts already exist, update them
+            existingCounts.counts = countsData;
+            await existingCounts.save();
+        } else {
+            // If counts do not exist, create a new record
+            const newCounts = new AnswerCounts({
+                qrCodeId: qrCodeId,
+                questionId: questionId,
+                counts: countsData
+            });
+            await newCounts.save();
+        }
+
+        res.status(200).json({
+            message: 'Counts and user details retrieved successfully',
+            questionId: questionId,
+            qrCodeId: qrCodeId,
+            data: response
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getTotalCountsForAllQuestions = async (req, res) => {
+    try {
+        const { qrCodeData } = req.params; // Get qrCodeData from URL parameters
+
+        // Fetch all questions
+        const questions = await SurveyQuestion.find().select('answerOptions');
+
+        // Prepare an object to store counts for all questions
+        const totalCountsResponse = {};
+
+        // Variable to track if any data is found for the given qrCodeData
+        let isDataFound = false;
+
+        for (let question of questions) {
+            // Find all submissions for the current question and qrCodeData
+            const submissions = await AnswerSubmission.find({ questionId: question._id, qrCodeId: qrCodeData })
+                .populate('userId', 'userName phoneNumber email');
+
+            // If there are submissions for this question and qrCodeData, process the data
+            if (submissions.length > 0) {
+                isDataFound = true;
+                const response = {};
+                const countsData = [];
+                question.answerOptions.forEach(option => {
+                    // Filter submissions for the current option
+                    const optionSubmissions = submissions.filter(sub => sub.submittedAnswer === option.optionText);
+
+                    // Count the number of submissions for this option
+                    const count = optionSubmissions.length;
+                    response[option.optionText] = {
+                        count: count,
+                        users: optionSubmissions.map(sub => ({
+                            userId: sub.userId._id,
+                            userName: sub.userId.userName,
+                            phoneNumber: sub.userId.phoneNumber,
+                            email: sub.userId.email,
+                            submittedAt: sub.submittedAt,
+                            timeTaken: sub.timeTaken
+                        }))
+                    };
+
+                    // Prepare data for saving counts
+                    countsData.push({ optionText: option.optionText, count: count });
+                });
+
+                // Save counts to the database for this question (update or create)
+                const existingCounts = await AnswerCounts.findOne({ questionId: question._id, qrCodeId: qrCodeData });
+                if (existingCounts) {
+                    existingCounts.counts = countsData;
+                    await existingCounts.save();
+                } else {
+                    const newCounts = new AnswerCounts({
+                        qrCodeId: qrCodeData,
+                        questionId: question._id,
+                        counts: countsData
+                    });
+                    await newCounts.save();
+                }
+
+                // Add the response data for the current question
+                totalCountsResponse[question._id] = {
+                    questionId: question._id,
+                    counts: response
+                };
+            }
+        }
+
+        // If no data is found for the given qrCodeData, send a response indicating no data found
+        if (!isDataFound) {
+            return res.status(404).json({
+                message: `No data found for the QR code: ${qrCodeData}`
+            });
+        }
+
+        // Send the response with counts for all questions
+        res.status(200).json({
+            message: 'Total counts for all questions retrieved successfully',
+            data: totalCountsResponse
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
