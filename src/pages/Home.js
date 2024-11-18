@@ -36,23 +36,23 @@ export default function Home() {
       {/* Create and Join Quiz Boxes */}
       <div className="flex justify-center gap-4 mt-4">
         {/* Create Quiz Box */}
-        <div
-          className="flex flex-col items-center p-4 bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow"
-          onClick={() => handleNavigation("/create-quiz")}
-        >
+        <div className="flex flex-col items-center p-4 bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow">
           <img src={plus} alt="Create Quiz" className="w-16 h-16 mb-2" />
-          <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg">
+          <button
+            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
+            onClick={() => handleNavigation("/create-quiz")}
+          >
             Create Quiz
           </button>
         </div>
 
         {/* Join Quiz Box */}
-        <div
-          className="flex flex-col items-center p-4 bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow"
-          onClick={() => navigate("/join-quiz")}
-        >
+        <div className="flex flex-col items-center p-4 bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow">
           <img src={join} alt="Join Quiz" className="w-16 h-16 mb-2" />
-          <button className="mt-2 px-4 py-2 bg-green-500 text-white rounded-lg">
+          <button
+            className="mt-2 px-4 py-2 bg-green-500 text-white rounded-lg"
+            onClick={() => navigate("/join-quiz")}
+          >
             Join Quiz
           </button>
         </div>

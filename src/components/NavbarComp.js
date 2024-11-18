@@ -1,9 +1,9 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
-import {faUser} from "@fortawesome/free-solid-svg-icons"
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+import logo from "../assets/GMI-Logo.png";
 
 const Navbar = () => {
   const { isAuthenticated, user, logout } = useContext(AuthContext);
@@ -23,13 +23,13 @@ const Navbar = () => {
   // Close dropdown when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event) => {
-      if (isProfileOpen && !event.target.closest('.profile-dropdown')) {
+      if (isProfileOpen && !event.target.closest(".profile-dropdown")) {
         setIsProfileOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isProfileOpen]);
 
   return (
@@ -38,7 +38,7 @@ const Navbar = () => {
         {/* Left: Logo with Welcome Message */}
         <div className="flex items-center gap-2 flex-shrink-0">
           <img
-            src="/api/placeholder/40/40"
+            src={logo}
             alt="GMI"
             className="h-10 w-10 rounded-full cursor-pointer"
             onClick={() => navigate("/")}
@@ -60,11 +60,13 @@ const Navbar = () => {
                 aria-haspopup="true"
               >
                 <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center">
-                  <span className="text-gray-600 text-sm"><FontAwesomeIcon icon={faUser} /></span>
+                  <span className="text-gray-600 text-sm">
+                    <FontAwesomeIcon icon={faUser} />
+                  </span>
                 </div>
-                <span 
+                <span
                   className={`text-gray-600 transition-transform duration-200 ${
-                    isProfileOpen ? 'transform rotate-180' : ''
+                    isProfileOpen ? "transform rotate-180" : ""
                   }`}
                 >
                   ▼
@@ -81,9 +83,9 @@ const Navbar = () => {
 
                     <button
                       className="w-full flex items-center gap-2 px-4 py-2 text-sm text-blue-300 hover:bg-blue-50 rounded-md transition-colors duration-200"
-                      onClick={()=>navigate("/me")}
+                      onClick={() => navigate("/profile")}
                     >
-                      <span className="text-blue-200">🚪</span>
+                      <span className="text-blue-200">👤</span>
                       Profile
                     </button>
                     {/* <div className="border-t border-gray-200"></div> */}
