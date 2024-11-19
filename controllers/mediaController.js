@@ -81,3 +81,16 @@ exports.deleteAllMedia = async (req, res) => {
     }
   };
   
+// GET /api/media
+exports.getAllMedia = async (req, res) => {
+  try {
+    const media = await Media.find(); // Retrieve all media records
+    if (!media || media.length === 0) {
+      return res.status(404).json({ message: 'No media files found' });
+    }
+
+    res.status(200).json({ media });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};

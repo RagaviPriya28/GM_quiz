@@ -16,5 +16,8 @@ router.get('/:id', protect, admin, mediaController.getMediaDetails);
 // DELETE /api/media/:id
 router.delete('/:id', protect, admin, mediaController.deleteMedia);
 
+// GET /api/media
+router.get('/',  protect, admin, mediaController.getAllMedia);
+
 
 module.exports = router;
