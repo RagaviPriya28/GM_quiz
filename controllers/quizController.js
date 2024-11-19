@@ -7,7 +7,11 @@ const User = require('../models/User');
 // Create a new quiz (admin only)
 exports.createQuiz = async (req, res) => {
   try {
-    const { title, description, categories, slides, questions, tenantId, duration } = req.body;
+    const { title, description, categoryId, slides, questions, tenantId, duration } = req.body;
+
+    if (!categoryId) {
+      return res.status(400).json({ message: 'Category ID is required' });
+    }
 
     // Validate categories, slides, and questions are valid ObjectIds
     const categoryIds = await Category.find({ '_id': { $in: categories } });
@@ -17,7 +21,7 @@ exports.createQuiz = async (req, res) => {
     const quiz = new Quiz({
       title,
       description,
-      categories,
+      categories: categoryId,
       slides,
       questions,
       tenantId,
