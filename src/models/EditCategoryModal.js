@@ -146,24 +146,6 @@ const EditCategoryModal = ({ isOpen, onClose, categoryId, onSuccess }) => {
                   placeholder="Enter category description"
                 />
               </div>
-
-              <div>
-                <label
-                  htmlFor="imageUrl"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Image URL
-                </label>
-                <input
-                  type="url"
-                  id="imageUrl"
-                  name="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter image URL (optional)"
-                />
-              </div>
             </div>
 
             <div className="mt-6 flex justify-end gap-3">
