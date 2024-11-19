@@ -5,6 +5,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { AuthContext } from "./context/AuthContext";
 import Home from "./pages/Home";
+import QuestionCreator from "./pages/QuestionCreator";
 
 // const ProtectedRoute = () => {
 //   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -30,6 +31,7 @@ export default function App() {
         element={isAuthenticated ? <Navigate to="/" /> : <RegisterPage />}
       />
       <Route path="/" element={<Home />} />
+      <Route path="/question" element={<QuestionCreator />} />
     </Routes>
   );
 }
