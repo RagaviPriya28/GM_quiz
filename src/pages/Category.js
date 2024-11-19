@@ -225,6 +225,9 @@ const Category = () => {
           </div>
         )}
       </div>
+
+
+      {/* create category model */}
       <CreateCategoryModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
