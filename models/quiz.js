@@ -7,7 +7,7 @@ const quizSchema = new mongoose.Schema({
   categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
   slides: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Slide' }],
   questions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],
-  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: false },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   status: { type: String, enum: ['draft', 'active', 'closed'], default: 'draft' },
   duration: { type: Number, default: 60 },
