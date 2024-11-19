@@ -5,9 +5,9 @@ import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { AuthContext } from "./context/AuthContext";
 import Home from "./pages/Home";
-import QuestionCreator from "./pages/QuestionCreator";
+
 import Category from "./pages/Category";
-import CreateQuiz from "./pages/CreateQuiz";
+import QuizCreator from "./pages/quizCreator";
 
 
 // const ProtectedRoute = () => {
@@ -35,10 +35,10 @@ export default function App() {
       />
       <Route path="/" element={<Home />} />
 
-      <Route path="/question" element={<QuestionCreator />} />
+      {/* <Route path="/question" element={<QuestionCreator />} /> */}
 
       <Route path="/select-category" element={<Category />} />
-      <Route path="/create/:id" element={<CreateQuiz />} />
+      <Route path="/create/:id" element={<QuizCreator />} />
 
     </Routes>
   );
