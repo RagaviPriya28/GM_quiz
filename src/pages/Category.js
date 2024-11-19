@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/NavbarComp";
 import CategoryCard from "../components/CategoryCardComp";
 import { Search, Plus } from "lucide-react";
+import CreateCategoryModal from "../models/CreateCategoryModal";
 
 const Category = () => {
   const navigate = useNavigate();
@@ -12,7 +13,8 @@ const Category = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [creating, setCreating] = useState(false);
-  const itemsPerPage = 8;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const itemsPerPage = 9;
 
   const getAuthHeaders = () => ({
     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -41,8 +43,7 @@ const Category = () => {
   }, []);
 
   const handleCreateCategory = () => {
-    // Add your navigation or modal logic here
-    console.log("Creating new category");
+    setIsModalOpen(true);
   };
 
   const handleCreateQuiz = async (categoryId) => {
@@ -79,8 +80,10 @@ const Category = () => {
 
   const filteredCategories = categories.filter(
     (category) =>
-      category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      category.description.toLowerCase().includes(searchQuery.toLowerCase())
+      (category.name &&
+        category.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (category.description &&
+        category.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
@@ -222,6 +225,17 @@ const Category = () => {
           </div>
         )}
       </div>
+
+
+      {/* create category model */}
+      <CreateCategoryModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={(newCategory) => {
+          setCategories((prev) => [...prev, newCategory]);
+          setIsModalOpen(false);
+        }}
+      />
     </div>
   );
 };
