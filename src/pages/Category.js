@@ -53,7 +53,7 @@ const Category = () => {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify({
-          categoryId: categoryId,
+          categoryId,
           duration: 60,
           isPublic: true,
           status: "draft",
@@ -65,6 +65,7 @@ const Category = () => {
       }
 
       const data = await response.json();
+      console.log(data);
       if (data.quiz && data.quiz._id) {
         navigate(`/create/${data.quiz._id}`);
       } else {
