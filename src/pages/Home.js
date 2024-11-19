@@ -40,7 +40,7 @@ export default function Home() {
           <img src={plus} alt="Create Quiz" className="w-16 h-16 mb-2" />
           <button
             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
-            onClick={() => handleNavigation("/create-quiz")}
+            onClick={() => handleNavigation("/select-category")}
           >
             Create Quiz
           </button>
