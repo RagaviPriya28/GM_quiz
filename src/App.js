@@ -7,7 +7,12 @@ import { AuthContext } from "./context/AuthContext";
 import Home from "./pages/Home";
 
 import Category from "./pages/Category";
+
 import QuizCreator from "./pages/quizCreator";
+
+
+import CreateQuiz from "./pages/CreateQuiz";
+import CategoryDetails from "./pages/CategoryDetails";
 
 
 // const ProtectedRoute = () => {
@@ -38,7 +43,12 @@ export default function App() {
       {/* <Route path="/question" element={<QuestionCreator />} /> */}
 
       <Route path="/select-category" element={<Category />} />
+
       <Route path="/create/:id" element={<QuizCreator />} />
+
+
+      <Route path="/create/:id" element={<CreateQuiz />} />
+      <Route path="/categories/:id" element={<CategoryDetails />} />
 
     </Routes>
   );

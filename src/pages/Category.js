@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/NavbarComp";
 import CategoryCard from "../components/CategoryCardComp";
 import { Search, Plus } from "lucide-react";
@@ -155,12 +155,14 @@ const Category = () => {
         {filteredCategories.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {currentCategories.map((category) => (
-              <CategoryCard
-                key={category._id}
-                category={category}
-                onCreateQuiz={handleCreateQuiz}
-                creating={creating}
-              />
+              <Link to={`/categories/${category._id}`} key={category._id}>
+                <CategoryCard
+                  key={category._id}
+                  category={category}
+                  onCreateQuiz={handleCreateQuiz}
+                  creating={creating}
+                />
+              </Link>
             ))}
           </div>
         ) : (
@@ -225,7 +227,6 @@ const Category = () => {
           </div>
         )}
       </div>
-
 
       {/* create category model */}
       <CreateCategoryModal
