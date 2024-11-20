@@ -4,7 +4,7 @@ const Quiz = require('../models/quiz');
 // Add a new question to a quiz
 exports.addQuestion = async (req, res) => {
   const { quizId } = req.params;
-  const { title, type, imageUrl, options, correctAnswer, points } = req.body;
+  const { title, type, imageUrl, options, correctAnswer, points, timer } = req.body;
 
   try {
     // Validate if the quiz exists
@@ -21,7 +21,8 @@ exports.addQuestion = async (req, res) => {
       imageUrl,
       options,
       correctAnswer,
-      points
+      points,
+      timer
     });
 
     await newQuestion.save();

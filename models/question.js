@@ -10,7 +10,8 @@ const questionSchema = new mongoose.Schema({
     required: false },
   options: [{ text: String, isCorrect: Boolean }],
   correctAnswer: [{ type: String }],
-  points: { type: Number, default: 100 },
+  points: { type: Number, default: 10 },
+  timer: { type: Number, default: 10 },
 });
 
 module.exports = mongoose.model('Question', questionSchema);
