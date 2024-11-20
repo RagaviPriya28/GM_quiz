@@ -6,6 +6,14 @@ const register = async (req, res) => {
   try {
     const { username, email, password, tenantId, mobile, role } = req.body;
 
+    // Check username existence separately
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.status(400).json({
+        field: "username",
+        message: "username is already registered",
+      });
+    }
     // Check email existence separately
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
