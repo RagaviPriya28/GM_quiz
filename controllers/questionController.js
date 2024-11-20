@@ -4,7 +4,7 @@ const Quiz = require('../models/quiz');
 // Add a new question to a quiz
 exports.addQuestion = async (req, res) => {
   const { quizId } = req.params;
-  const { title, type, options, correctAnswer, points } = req.body;
+  const { title, type, imageUrl, options, correctAnswer, points } = req.body;
 
   try {
     // Validate if the quiz exists
@@ -18,6 +18,7 @@ exports.addQuestion = async (req, res) => {
       quiz: quizId,
       title,
       type,
+      imageUrl,
       options,
       correctAnswer,
       points
@@ -36,30 +37,56 @@ exports.getQuestions = async (req, res) => {
   const { quizId } = req.params;
 
   try {
-    // Find questions related to the quiz
-    const questions = await Question.find({ quiz: quizId });
+    // Base URL for constructing the full image path
+    const baseUrl = `${req.protocol}://${req.get('host')}/uploads/`;
+
+    // Find questions related to the quiz and populate the imageUrl field
+    const questions = await Question.find({ quiz: quizId })
+      .populate('imageUrl', 'path'); // Populating imageUrl to fetch the path field
+
     if (questions.length === 0) {
       return res.status(404).json({ message: 'No questions found for this quiz' });
     }
 
-    res.status(200).json(questions);
+    // Map through questions and append the full image URL
+    const questionsWithFullImageUrl = questions.map(question => {
+      const questionObj = question.toObject();
+      if (questionObj.imageUrl && questionObj.imageUrl.path) {
+        questionObj.imageUrl = `${baseUrl}${questionObj.imageUrl.path.split('\\').pop()}`;
+      }
+      return questionObj;
+    });
+
+    res.status(200).json(questionsWithFullImageUrl);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
 };
 
+
 // Get details of a specific question
 exports.getQuestionById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const question = await Question.findById(id);
+    // Base URL for constructing the full image path
+    const baseUrl = `${req.protocol}://${req.get('host')}/uploads/`;
+
+    // Find the question by ID and populate the imageUrl field
+    const question = await Question.findById(id).populate('imageUrl', 'path'); // Populate imageUrl with the path field
+
     if (!question) {
       return res.status(404).json({ message: 'Question not found' });
     }
 
-    res.status(200).json(question);
+    // Convert the question object to plain JSON and append the full image URL
+    const questionObj = question.toObject();
+    if (questionObj.imageUrl && questionObj.imageUrl.path) {
+      questionObj.imageUrl = `${baseUrl}${questionObj.imageUrl.path.split('\\').pop()}`;
+    }
+
+    res.status(200).json(questionObj);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -69,7 +96,7 @@ exports.getQuestionById = async (req, res) => {
 // Update a question (admin only)
 exports.updateQuestion = async (req, res) => {
   const { id } = req.params;
-  const { title, type, options, correctAnswer, points } = req.body;
+  const { title, type, imageUrl, options, correctAnswer, points } = req.body;
 
   try {
     const question = await Question.findById(id);
@@ -80,6 +107,7 @@ exports.updateQuestion = async (req, res) => {
     // Update the question with new values
     question.title = title || question.title;
     question.type = type || question.type;
+    question.imageUrl = imageUrl || question.imageUrl;
     question.options = options || question.options;
     question.correctAnswer = correctAnswer || question.correctAnswer;
     question.points = points || question.points;
