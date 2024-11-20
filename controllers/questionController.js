@@ -97,7 +97,7 @@ exports.getQuestionById = async (req, res) => {
 // Update a question (admin only)
 exports.updateQuestion = async (req, res) => {
   const { id } = req.params;
-  const { title, type, imageUrl, options, correctAnswer, points } = req.body;
+  const { title, type, imageUrl, options, correctAnswer, points, timer } = req.body;
 
   try {
     const question = await Question.findById(id);
@@ -112,6 +112,7 @@ exports.updateQuestion = async (req, res) => {
     question.options = options || question.options;
     question.correctAnswer = correctAnswer || question.correctAnswer;
     question.points = points || question.points;
+    question.timer = timer || question.timer;
 
     await question.save();
     res.status(200).json(question);
