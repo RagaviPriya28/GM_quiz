@@ -200,12 +200,12 @@ export const LoginPage = () => {
           </div> */}
 
           {/* Divider */}
-          <div className="flex items-center justify-center mt-4">
+          {/* <div className="flex items-center justify-center mt-4">
             <p>Join quiz using</p>
-          </div>
+          </div> */}
 
           {/* Join Quiz Options */}
-          <div className="mt-4 space-y-2">
+          {/* <div className="mt-4 space-y-2">
             <button
               type="button"
               className="w-full border border-gray-300 text-gray-700 rounded-md py-2 px-4 hover:bg-gray-50"
@@ -219,7 +219,7 @@ export const LoginPage = () => {
             >
               Enter the PIN
             </button>
-          </div>
+          </div> */}
         </form>
       </div>
     </div>
