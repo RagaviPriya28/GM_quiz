@@ -13,10 +13,10 @@ export const RegisterPage = () => {
 
   // State variables
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
-  const [phoneError, setPhoneError] = useState("");
+  const [mobileError, setMobileError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [generalError, setGeneralError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -31,7 +31,7 @@ export const RegisterPage = () => {
 
     // Clear previous errors
     setEmailError("");
-    setPhoneError("");
+    setMobileError("");
     setPasswordError("");
     setGeneralError("");
 
@@ -45,11 +45,11 @@ export const RegisterPage = () => {
     }
 
     // Phone validation
-    if (!phone) {
-      setPhoneError("Phone number is required");
+    if (!mobile) {
+      setMobileError("Phone number is required");
       isValid = false;
-    } else if (phone.length < 10) {
-      setPhoneError("Please enter a valid phone number");
+    } else if (mobile.length < 10) {
+      setMobileError("Number should be 10 digits");
       isValid = false;
     }
 
@@ -72,25 +72,28 @@ export const RegisterPage = () => {
 
     if (validateForm()) {
       try {
-        await register(email, phone, password);
+        await register(email, mobile, password);
         navigate("/");
       } catch (error) {
-        try {
-          const errorObj = JSON.parse(error.message);
+        // Clear all previous errors first
+        setEmailError("");
+        setMobileError("");
+        setPasswordError("");
+        setGeneralError("");
 
-          // Clear all previous errors first
-          setEmailError("");
-          setPhoneError("");
-          setPasswordError("");
-          setGeneralError("");
-
-          // Set new errors
-          if (errorObj.email) setEmailError(errorObj.email);
-          if (errorObj.phone) setPhoneError(errorObj.phone);
-          if (errorObj.password) setPasswordError(errorObj.password);
-          if (errorObj.general) setGeneralError(errorObj.general);
-        } catch {
-          setGeneralError("An unexpected error occurred. Please try again.");
+        // Set the appropriate error based on the field
+        switch (error.field) {
+          case "email":
+            setEmailError(error.message);
+            break;
+          case "mobile":
+            setMobileError(error.message);
+            break;
+          case "general":
+            setGeneralError(error.message);
+            break;
+          default:
+            setGeneralError("An unexpected error occurred. Please try again.");
         }
       }
     }
@@ -138,27 +141,27 @@ export const RegisterPage = () => {
           {/* Phone Number Input */}
           <div>
             <label
-              htmlFor="register-phone"
+              htmlFor="register-mobile"
               className="block text-sm font-medium text-gray-700"
             >
               Phone Number
             </label>
             <PhoneInput
-              id="register-phone"
-              value={phone}
+              id="register-mobile"
+              value={mobile}
               onChange={(value) => {
-                setPhone(value);
-                setPhoneError("");
+                setMobile(value);
+                setMobileError("");
               }}
               className={`mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-                phoneError ? "border-red-500" : "border-gray-300"
+                mobileError ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="Enter phone number"
               defaultCountry="IN"
               aria-label="Phone Number"
             />
-            {phoneError && (
-              <p className="mt-1 text-sm text-red-600">{phoneError}</p>
+            {mobileError && (
+              <p className="mt-1 text-sm text-red-600">{mobileError}</p>
             )}
           </div>
 

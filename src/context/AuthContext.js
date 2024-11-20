@@ -114,41 +114,27 @@ export const AuthProvider = ({ children }) => {
 
       const { user, token } = response.data;
 
-      // Store user and token immediately after registration
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("token", token);
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      // Dispatch LOGIN action directly instead of calling login()
       dispatch({ type: "LOGIN", payload: { user, token } });
 
       return response.data;
     } catch (error) {
       const errorResponse = error.response?.data;
-      if (
-        errorResponse?.message ===
-        "User already exists with this email or mobile number."
-      ) {
-        if (error.response?.data?.field === "email") {
-          throw new Error(JSON.stringify({ email: "Email already exists" }));
-        } else if (error.response?.data?.field === "mobile") {
-          throw new Error(
-            JSON.stringify({ phone: "Phone number already exists" })
-          );
-        } else {
-          throw new Error(
-            JSON.stringify({
-              email: "Email or phone number already exists",
-              phone: "Email or phone number already exists",
-            })
-          );
-        }
+
+      if (errorResponse?.field && errorResponse?.message) {
+        // Convert the error to match our expected format
+        throw {
+          field: errorResponse.field,
+          message: errorResponse.message,
+        };
       } else {
-        throw new Error(
-          JSON.stringify({
-            general: "An error occurred. Please try again later.",
-          })
-        );
+        throw {
+          field: "general",
+          message: "An error occurred. Please try again later.",
+        };
       }
     }
   };

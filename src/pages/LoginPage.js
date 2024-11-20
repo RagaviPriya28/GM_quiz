@@ -179,11 +179,11 @@ export const LoginPage = () => {
             </p>
           </div>
           {/* Divider */}
-          <div className="flex items-center justify-center mt-4">
+          {/* <div className="flex items-center justify-center mt-4">
             <p>OR</p>
-          </div>
+          </div> */}
           {/* Social Login Buttons */}
-          <div className="space-y-4 mt-4">
+          {/* <div className="space-y-4 mt-4">
             <button
               type="button"
               className="w-full bg-black text-white rounded-md py-2 px-4 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
@@ -197,7 +197,7 @@ export const LoginPage = () => {
             >
               <span>Login with Facebook</span>
             </button>
-          </div>
+          </div> */}
 
           {/* Divider */}
           <div className="flex items-center justify-center mt-4">
