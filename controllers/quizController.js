@@ -14,7 +14,7 @@ exports.createQuiz = async (req, res) => {
     }
 
     // Validate categories, slides, and questions are valid ObjectIds
-    const categoryIds = await Category.find({ '_id': { $in: categories } });
+    const categoryIds = await Category.find({ '_id': { $in: categoryId } });
     const slideIds = await Slide.find({ '_id': { $in: slides } });
     const questionIds = await Question.find({ '_id': { $in: questions } });
 
