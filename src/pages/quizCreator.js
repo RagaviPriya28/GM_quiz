@@ -13,6 +13,7 @@ import {
   Upload
 } from 'lucide-react';
 import Modal from '../models/CreateQuestion';
+import SettingsModal from '../models/SettingsModal';
 
 
 
@@ -264,6 +265,7 @@ const QuizCreator = () => {
   const [answerType, setAnswerType] = useState('Single select');
   const [isAddQuestionOpen, setIsAddQuestionOpen] = useState(false);
   const [selectedQuestionType, setSelectedQuestionType] = useState(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const questionTypes = [
     { id: 'multiple_choice', name: 'Multiple Choice', icon: CheckSquare, description: 'Students select one correct answer' },
@@ -305,15 +307,25 @@ const QuizCreator = () => {
               GMI
             </span>
             <div className="relative">
-              <input
-                type="text"
-                placeholder="Enter the title..."
-                className="w-64 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
-              />
+            <input
+              type="text"
+              placeholder="Enter the title..."
+              className="w-64 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none cursor-pointer"
+              onClick={() => setIsSettingsOpen(true)}
+              readOnly
+            />
+            <SettingsModal 
+            isOpen={isSettingsOpen}
+            onClose={() => setIsSettingsOpen(false)}
+            onSave={() => {
+              // Handle saving settings
+              setIsSettingsOpen(false);
+            }}
+          />
             </div>
-            <button className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+            {/* <button className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
               <Settings className="w-5 h-5" />
-            </button>
+            </button> */}
           </div>
           
           <div className="flex items-center gap-3">
@@ -459,7 +471,11 @@ const QuizCreator = () => {
         </div>
       </Modal>
     </div>
+    
   );
 };
 
 export default QuizCreator;
+
+
+
