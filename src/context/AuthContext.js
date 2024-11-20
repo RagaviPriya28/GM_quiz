@@ -60,29 +60,44 @@ export const AuthProvider = ({ children }) => {
     return () => axios.interceptors.response.eject(interceptor);
   }, []);
 
-  const login = async (user, token) => {
-    localStorage.setItem("user", JSON.stringify(user));
-    localStorage.setItem("token", token);
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    dispatch({ type: "LOGIN", payload: { user, token } });
-  };
-
-  const logout = async () => {
+  const login = async (email, password, rememberMe) => {
     try {
-      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        {
+          email,
+          password,
+        }
+      );
 
-      // Call the server-side logout endpoint
-      await axios.post(`http://localhost:5000/api/auth/logout`, { token });
+      const { user, token } = response.data;
 
-      // Clear local storage and remove the authorization header
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
-      delete axios.defaults.headers.common["Authorization"];
+      if (rememberMe) {
+        localStorage.setItem("email", email);
+        localStorage.setItem("password", password);
+      } else {
+        localStorage.removeItem("email");
+        localStorage.removeItem("password");
+      }
 
-      dispatch({ type: "LOGOUT" });
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      dispatch({ type: "LOGIN", payload: { user, token } });
     } catch (error) {
-      console.error("Logout failed", error);
-      throw error; // Optionally, handle this error in your UI
+      const errorResponse = error.response?.data;
+      if (errorResponse?.message === "Invalid Email.") {
+        throw new Error(JSON.stringify({ email: "Email does not exist" }));
+      } else if (errorResponse?.message === "Invalid Password.") {
+        throw new Error(JSON.stringify({ password: "Enter valid password" }));
+      } else {
+        throw new Error(
+          JSON.stringify({
+            general: "An error occurred. Please try again later.",
+          })
+        );
+      }
     }
   };
 
@@ -96,11 +111,58 @@ export const AuthProvider = ({ children }) => {
           password,
         }
       );
+
       const { user, token } = response.data;
-      await login(user, token);
+
+      // Store user and token immediately after registration
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      // Dispatch LOGIN action directly instead of calling login()
+      dispatch({ type: "LOGIN", payload: { user, token } });
+
       return response.data;
     } catch (error) {
-      console.error("Registration failed", error);
+      const errorResponse = error.response?.data;
+      if (
+        errorResponse?.message ===
+        "User already exists with this email or mobile number."
+      ) {
+        if (error.response?.data?.field === "email") {
+          throw new Error(JSON.stringify({ email: "Email already exists" }));
+        } else if (error.response?.data?.field === "mobile") {
+          throw new Error(
+            JSON.stringify({ phone: "Phone number already exists" })
+          );
+        } else {
+          throw new Error(
+            JSON.stringify({
+              email: "Email or phone number already exists",
+              phone: "Email or phone number already exists",
+            })
+          );
+        }
+      } else {
+        throw new Error(
+          JSON.stringify({
+            general: "An error occurred. Please try again later.",
+          })
+        );
+      }
+    }
+  };
+
+  const logout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(`http://localhost:5000/api/auth/logout`, { token });
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      delete axios.defaults.headers.common["Authorization"];
+      dispatch({ type: "LOGOUT" });
+    } catch (error) {
+      console.error("Logout failed", error);
       throw error;
     }
   };

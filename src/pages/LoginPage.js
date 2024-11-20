@@ -3,16 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { AuthContext } from "../context/AuthContext";
-import axios from "axios";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext); // Access login method from context
+  const { login } = useContext(AuthContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [generalError, setGeneralError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -31,49 +31,40 @@ export const LoginPage = () => {
     e.preventDefault();
     let isValid = true;
 
+    // Clear all previous errors
+    setEmailError("");
+    setPasswordError("");
+    setGeneralError("");
+
     if (!email) {
-      setEmailError("Enter a valid email address");
+      setEmailError("Enter email");
       isValid = false;
-    } else {
-      setEmailError("");
     }
 
     if (!password) {
-      setPasswordError("Enter correct password");
+      setPasswordError("Enter your password");
       isValid = false;
-    } else {
-      setPasswordError("");
     }
 
     if (isValid) {
       try {
-        // Send a POST request to authenticate
-        const response = await axios.post("http://localhost:5000/api/auth/login", {
-          email,
-          password,
-        });
-
-        // If successful, get user and token from response
-        const { user, token } = response.data;
-
-        // Call context login function to store user and token globally
-        login(user, token);
-
-        if (rememberMe) {
-          localStorage.setItem("email", email);
-          localStorage.setItem("password", password);
-        } else {
-          localStorage.removeItem("email");
-          localStorage.removeItem("password");
-        }
-
+        await login(email, password, rememberMe);
         navigate("/");
       } catch (error) {
-        // Handle errors (e.g., incorrect credentials)
-        if (error.response && error.response.status === 401) {
-          setPasswordError("Invalid email or password");
-        } else {
-          console.error("Login error:", error);
+        // Parse the error message from the JSON string
+        try {
+          const errorObj = JSON.parse(error.message);
+          if (errorObj.email) {
+            setEmailError(errorObj.email);
+          }
+          if (errorObj.password) {
+            setPasswordError(errorObj.password);
+          }
+          if (errorObj.general) {
+            setGeneralError(errorObj.general);
+          }
+        } catch (parseError) {
+          setGeneralError("An unexpected error occurred");
         }
       }
     }
@@ -83,6 +74,14 @@ export const LoginPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
         <h2 className="text-2xl font-bold text-center mb-8">Login</h2>
+
+        {/* Display general error at the top if present */}
+        {generalError && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {generalError}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email Input */}
           <div>
@@ -100,12 +99,17 @@ export const LoginPage = () => {
                 setEmail(e.target.value);
                 setEmailError("");
               }}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className={`mt-1 block w-full rounded-md border ${
+                emailError ? "border-red-500" : "border-gray-300"
+              } px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
               placeholder="Enter your email"
               aria-label="Email"
             />
-            {emailError && <p className="ml-2 text-red-600">{emailError}</p>}
+            {emailError && (
+              <p className="mt-1 text-sm text-red-600">{emailError}</p>
+            )}
           </div>
+
           {/* Password Input */}
           <div>
             <label
@@ -123,7 +127,9 @@ export const LoginPage = () => {
                   setPassword(e.target.value);
                   setPasswordError("");
                 }}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className={`mt-1 block w-full rounded-md border ${
+                  passwordError ? "border-red-500" : "border-gray-300"
+                } px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                 placeholder="Enter your password"
                 aria-label="Password"
               />
@@ -137,9 +143,10 @@ export const LoginPage = () => {
               </button>
             </div>
             {passwordError && (
-              <p className="ml-2 text-red-600">{passwordError}</p>
+              <p className="mt-1 text-sm text-red-600">{passwordError}</p>
             )}
           </div>
+
           {/* Remember Me Checkbox */}
           <div className="flex items-center">
             <input
