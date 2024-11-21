@@ -1,0 +1,52 @@
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MzIzNDhlYTZlNmI1MzEzNmFiZWExNCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTczMTgyODU4MCwiZXhwIjoxNzMxODMyMTgwfQ.gCNlweXMbTpLroSaf3TCSm7R77XzCtFBN1NmiS1PNdo
+
+qr_1731828834457
+
+{
+    "message": "User registered successfully via QR code",
+    "user": {
+        "email": "vinitha@example.com",
+        "phoneNumber": "1244627896",
+        "userName": "vinitha",
+        "registeredViaQRCode": true,
+        "qrCodeData": "qr_1731828834457",
+        "status": "waiting in lobby",
+        "_id": "67399ca915a85d764047d3a1",
+        "createdAt": "2024-11-17T07:35:05.868Z",
+        "updatedAt": "2024-11-17T07:35:05.868Z",
+        "__v": 0
+    }
+}
+
+
+{
+    "message": "User registered successfully via QR code",
+    "user": {
+        "email": "ragavi@example.com",
+        "phoneNumber": "9244627836",
+        "userName": "ragavi",
+        "registeredViaQRCode": true,
+        "qrCodeData": "qr_1731828834457",
+        "status": "waiting in lobby",
+        "_id": "67399cc615a85d764047d3a4",
+        "createdAt": "2024-11-17T07:35:34.826Z",
+        "updatedAt": "2024-11-17T07:35:34.826Z",
+        "__v": 0
+    }
+}
+
+{
+    "message": "User registered successfully via QR code",
+    "user": {
+        "email": "keerthi@example.com",
+        "phoneNumber": "1244627836",
+        "userName": "keerthi",
+        "registeredViaQRCode": true,
+        "qrCodeData": "qr_1731828834457",
+        "status": "waiting in lobby",
+        "_id": "67399ce015a85d764047d3a7",
+        "createdAt": "2024-11-17T07:36:00.979Z",
+        "updatedAt": "2024-11-17T07:36:00.979Z",
+        "__v": 0
+    }
+}
