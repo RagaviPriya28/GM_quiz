@@ -163,6 +163,17 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+// Helper validation functions
+function validateEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+function validateMobileNumber(mobile) {
+  const mobileRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
+  return mobileRegex.test(mobile);
+}
+
 exports.deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
