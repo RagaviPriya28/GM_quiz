@@ -15,9 +15,11 @@ export const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState(""); // New state for username
   const [emailError, setEmailError] = useState("");
   const [mobileError, setMobileError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [usernameError, setUsernameError] = useState(""); // New state for username error
   const [generalError, setGeneralError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -33,6 +35,7 @@ export const RegisterPage = () => {
     setEmailError("");
     setMobileError("");
     setPasswordError("");
+    setUsernameError(""); // Clear username error
     setGeneralError("");
 
     // Email validation
@@ -41,6 +44,12 @@ export const RegisterPage = () => {
       isValid = false;
     } else if (!EMAIL_REGEX.test(email)) {
       setEmailError("Please enter a valid email address");
+      isValid = false;
+    }
+
+    // Username validation (no regex, just check for non-empty value)
+    if (!username) {
+      setUsernameError("Username is required");
       isValid = false;
     }
 
@@ -72,17 +81,21 @@ export const RegisterPage = () => {
 
     if (validateForm()) {
       try {
-        await register(email, mobile, password);
+        await register(username, email, mobile, password); // Pass username to register function
         navigate("/");
       } catch (error) {
         // Clear all previous errors first
         setEmailError("");
         setMobileError("");
         setPasswordError("");
+        setUsernameError(""); // Clear username error
         setGeneralError("");
 
         // Set the appropriate error based on the field
         switch (error.field) {
+          case "username":
+            setUsernameError(error.message);
+            break;
           case "email":
             setEmailError(error.message);
             break;
@@ -111,6 +124,33 @@ export const RegisterPage = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Username Input */}
+          <div>
+            <label
+              htmlFor="register-username"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Username
+            </label>
+            <input
+              type="text"
+              id="register-username"
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+                setUsernameError("");
+              }}
+              className={`mt-1 block w-full rounded-md border ${
+                usernameError ? "border-red-500" : "border-gray-300"
+              } px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+              placeholder="Enter your username"
+              aria-label="Username"
+            />
+            {usernameError && (
+              <p className="mt-1 text-sm text-red-600">{usernameError}</p>
+            )}
+          </div>
+
           {/* Email Input */}
           <div>
             <label

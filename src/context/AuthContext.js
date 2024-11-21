@@ -101,11 +101,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (email, mobile, password) => {
+  const register = async (username,email, mobile, password) => {
     try {
       const response = await axios.post(
         `http://localhost:5000/api/auth/register`,
         {
+          username,
           email,
           mobile,
           password,

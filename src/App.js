@@ -5,15 +5,10 @@ import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { AuthContext } from "./context/AuthContext";
 import Home from "./pages/Home";
-
 import Category from "./pages/Category";
-
 import QuizCreator from "./pages/quizCreator";
-
-
-import CreateQuiz from "./pages/CreateQuiz";
 import CategoryDetails from "./pages/CategoryDetails";
-
+import { QuizProvider } from "./context/QuizContext";
 
 // const ProtectedRoute = () => {
 //   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -39,17 +34,10 @@ export default function App() {
         element={isAuthenticated ? <Navigate to="/" /> : <RegisterPage />}
       />
       <Route path="/" element={<Home />} />
-
       {/* <Route path="/question" element={<QuestionCreator />} /> */}
-
       <Route path="/select-category" element={<Category />} />
-
       <Route path="/create/:id" element={<QuizCreator />} />
-
-
-      <Route path="/create/:id" element={<CreateQuiz />} />
       <Route path="/categories/:id" element={<CategoryDetails />} />
-
     </Routes>
   );
 }

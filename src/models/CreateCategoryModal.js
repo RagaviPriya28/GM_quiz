@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { X } from "lucide-react";
+import { CategoryContext } from "../context/CategoryContext";
 
-const CreateCategoryModal = ({ isOpen, onClose, onSuccess }) => {
+const CreateCategoryModal = ({ isOpen, onClose }) => {
+  const { createCategory } = useContext(CategoryContext);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    imageUrl: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -20,30 +21,30 @@ const CreateCategoryModal = ({ isOpen, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Prevent multiple submissions
+    if (isSubmitting) return;
+
     setIsSubmitting(true);
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5000/api/categories", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      const newCategory = await createCategory({
+        name: formData.name,
+        description: formData.description,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create category");
+      // Validate the received category
+      if (!newCategory || !newCategory.name) {
+        throw new Error("Invalid category data received");
       }
 
-      const data = await response.json();
-      onSuccess(data);
+      // Reset form and close modal
+      setFormData({ name: "", description: "" });
       onClose();
-      setFormData({ name: "", description: "", imageUrl: "" });
     } catch (err) {
-      setError(err.message);
+      console.error("Category creation error:", err);
+      setError(err.message || "Failed to create category");
     } finally {
       setIsSubmitting(false);
     }

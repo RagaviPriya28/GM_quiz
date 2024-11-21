@@ -1,51 +1,37 @@
-import React from "react";
+import React, { useContext } from "react";
+import { Plus } from "lucide-react";
+import { QuizContext } from "../context/QuizContext";
 
+const CategoryCard = ({ category }) => {
+  const { createQuiz } = useContext(QuizContext);
 
-const CategoryCard = ({ category, onCreateQuiz, creating }) => {
+  const handleCreateQuiz = () => {
+    createQuiz(category._id);
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
-      <div className="p-6">
-        <h3 className="font-semibold text-xl text-gray-800 mb-3">
+    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col h-[200px] overflow-hidden">
+      {/* Content Container with Fixed Height and Overflow */}
+      <div className="p-4 flex flex-col flex-grow">
+        <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-2">
           {category.name}
         </h3>
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-          {category.description}
+
+        {/* Description with Line Clamping */}
+        <p className="text-gray-600 mb-4 line-clamp-3 flex-grow">
+          {category.description || "No description available"}
         </p>
-        <button
-          className={`w-full py-2.5 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium flex items-center justify-center ${
-            creating ? "opacity-75 cursor-not-allowed" : ""
-          }`}
-          onClick={() => onCreateQuiz(category._id)}
-          disabled={creating}
-        >
-          {creating ? (
-            <>
-              <svg
-                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              Creating Quiz...
-            </>
-          ) : (
-            "Create Quiz"
-          )}
-        </button>
+
+        {/* Action Buttons */}
+        <div className="flex items-center mt-auto">
+          <button
+            onClick={handleCreateQuiz}
+            className="flex items-center gap-1 px-3 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm"
+          >
+            <Plus className="h-4 w-4" />
+            Create Quiz
+          </button>
+        </div>
       </div>
     </div>
   );
