@@ -133,10 +133,11 @@ exports.deleteQuestion = async (req, res) => {
     }
 
     // Delete the question
-    await question.remove();
-    res.status(200).json({ message: 'Question deleted' });
+    await Question.deleteOne({ _id: id });
+    res.status(200).json({ message: 'Question deleted successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
 };
+
