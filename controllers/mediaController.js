@@ -89,8 +89,16 @@ exports.getAllMedia = async (req, res) => {
       return res.status(404).json({ message: 'No media files found' });
     }
 
-    res.status(200).json({ media });
+    // Construct full URL for each media file
+    const host = req.protocol + '://' + req.get('host'); // e.g., http://localhost:5000
+    const mediaWithPaths = media.map((item) => ({
+      ...item.toObject(),
+      url: `${host}/${item.path.replace(/\\/g, '/')}`, // Convert backslashes to forward slashes
+    }));
+
+    res.status(200).json({ media: mediaWithPaths });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }
 };
+

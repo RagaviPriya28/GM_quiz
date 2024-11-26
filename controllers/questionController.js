@@ -13,12 +13,24 @@ exports.addQuestion = async (req, res) => {
       return res.status(404).json({ message: 'Quiz not found' });
     }
 
+    // Fetch the image document by ID (using Media model)
+    const image = await Media.findById(imageUrl); // Make sure imageUrl is the media _id
+    if (!image) {
+      return res.status(404).json({ message: 'Image not found' });
+    }
+
+    // Base URL for constructing the full image path
+    const baseUrl = `${req.protocol}://${req.get('host')}/uploads/`;
+
+    // Construct the full image URL (from the Media path)
+    const fullImageUrl = `${baseUrl}${image.path.split('\\').pop()}`;
+
     // Create a new question
     const newQuestion = new Question({
       quiz: quizId,
       title,
       type,
-      imageUrl,
+      imageUrl: image._id, // Save the image ID in the database
       options,
       correctAnswer,
       points,
@@ -26,7 +38,14 @@ exports.addQuestion = async (req, res) => {
     });
 
     await newQuestion.save();
-    res.status(201).json(newQuestion);
+
+    // Include the full image URL in the response
+    const responseQuestion = {
+      ...newQuestion.toObject(),
+      imageUrl: fullImageUrl // Replace image ID with the full URL in the response
+    };
+
+    res.status(201).json(responseQuestion);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -102,25 +121,52 @@ exports.updateQuestion = async (req, res) => {
   try {
     const question = await Question.findById(id);
     if (!question) {
-      return res.status(404).json({ message: 'Question not found' });
+      return res.status(404).json({ message: "Question not found" });
     }
 
-    // Update the question with new values
+    // Update fields
     question.title = title || question.title;
     question.type = type || question.type;
-    question.imageUrl = imageUrl || question.imageUrl;
+    question.imageUrl = imageUrl || question.imageUrl; // Should be an ObjectId
     question.options = options || question.options;
     question.correctAnswer = correctAnswer || question.correctAnswer;
     question.points = points || question.points;
     question.timer = timer || question.timer;
 
     await question.save();
-    res.status(200).json(question);
+
+    // Populate `imageUrl` to include Media details
+    const updatedQuestion = await Question.findById(id).populate("imageUrl");
+
+    // Construct full URL if `imageUrl` exists
+    const host = req.protocol + "://" + req.get("host"); // e.g., http://localhost:5000
+    const fullImageUrl = updatedQuestion.imageUrl
+      ? `${host}/${updatedQuestion.imageUrl.path.replace(/\\/g, "/")}`
+      : null;
+
+    res.status(200).json({
+      message: "Question updated successfully",
+      updatedFields: {
+        ...(title && { title }),
+        ...(type && { type }),
+        ...(imageUrl && { imageUrl: fullImageUrl }),
+        ...(options && { options }),
+        ...(correctAnswer && { correctAnswer }),
+        ...(points && { points }),
+        ...(timer && { timer }),
+      },
+      question: {
+        ...updatedQuestion.toObject(),
+        imageUrl: fullImageUrl, // Replace with the full URL in the response
+      },
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
+
+
 
 // Delete a question (admin only)
 exports.deleteQuestion = async (req, res) => {
