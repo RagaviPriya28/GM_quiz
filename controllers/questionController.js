@@ -40,6 +40,9 @@ exports.addQuestion = async (req, res) => {
 
     await newQuestion.save();
 
+    quiz.questions.push(newQuestion._id);
+    await quiz.save();
+
     // Include the full image URL in the response
     const responseQuestion = {
       ...newQuestion.toObject(),

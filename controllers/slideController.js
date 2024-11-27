@@ -25,6 +25,9 @@ exports.addSlide = async (req, res) => {
 
     await newSlide.save();
 
+    quiz.slides.push(newSlide._id);
+    await quiz.save();
+
     return res.status(201).json({
       message: 'Slide added successfully',
       slide: newSlide
@@ -153,7 +156,7 @@ exports.deleteSlide = async (req, res) => {
       return res.status(404).json({ message: 'Slide not found' });
     }
 
-    await slide.remove();
+    await slide.deleteOne({ _id: id });
 
     return res.status(200).json({
       message: 'Slide deleted successfully'
