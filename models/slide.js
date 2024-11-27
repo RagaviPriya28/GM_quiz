@@ -7,7 +7,7 @@ const slideSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['Classic', 'Big Title', 'Title and Text', 'Bullet Points', 'Big Media'],
+    enum: ['Classic', 'Big Title', 'Bullet Points'],
     default: 'Classic' 
   },
   imageUrl: {

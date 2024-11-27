@@ -50,7 +50,7 @@ exports.addSlide = async (req, res) => {
     }
 
     // Validate the type
-    const validTypes = ['Classic', 'Big Title', 'Title and Text', 'Bullet Points', 'Big Media'];
+    const validTypes = ['Classic', 'Big Title', 'Bullet Points'];
     if (!validTypes.includes(type)) {
       return res.status(400).json({ message: `Invalid type. Valid types are: ${validTypes.join(', ')}` });
     }
