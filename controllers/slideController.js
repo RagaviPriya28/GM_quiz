@@ -3,10 +3,45 @@ const Quiz = require('../models/quiz');    // Quiz model
 const { checkAdmin } = require('../middlewares/auth');  // Middleware to check if user is admin
 
 // Create a new slide for a quiz (admin only)
+// exports.addSlide = async (req, res) => {
+//   try {
+//     const { quizId } = req.params;
+//     const { title, content, imageUrl, position } = req.body;
+
+//     // Check if quiz exists
+//     const quiz = await Quiz.findById(quizId);
+//     if (!quiz) {
+//       return res.status(404).json({ message: 'Quiz not found' });
+//     }
+
+//     // Create new slide
+//     const newSlide = new Slide({
+//       quiz: quizId,
+//       title,
+//       content,
+//       imageUrl,
+//       position
+//     });
+
+//     await newSlide.save();
+
+//     quiz.slides.push(newSlide._id);
+//     await quiz.save();
+
+//     return res.status(201).json({
+//       message: 'Slide added successfully',
+//       slide: newSlide
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ message: 'Server error', error: error.message });
+//   }
+// };
+
 exports.addSlide = async (req, res) => {
   try {
     const { quizId } = req.params;
-    const { title, content, imageUrl, position } = req.body;
+    const { title, content, type, imageUrl, position } = req.body; // Include type in the request body
 
     // Check if quiz exists
     const quiz = await Quiz.findById(quizId);
@@ -14,23 +49,31 @@ exports.addSlide = async (req, res) => {
       return res.status(404).json({ message: 'Quiz not found' });
     }
 
+    // Validate the type
+    const validTypes = ['Classic', 'Big Title', 'Title and Text', 'Bullet Points', 'Big Media'];
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({ message: `Invalid type. Valid types are: ${validTypes.join(', ')}` });
+    }
+
     // Create new slide
     const newSlide = new Slide({
       quiz: quizId,
       title,
       content,
+      type,
       imageUrl,
-      position
+      position,
     });
 
     await newSlide.save();
 
+    // Add the slide ID to the quiz's slides array
     quiz.slides.push(newSlide._id);
     await quiz.save();
 
     return res.status(201).json({
       message: 'Slide added successfully',
-      slide: newSlide
+      slide: newSlide,
     });
   } catch (error) {
     console.error(error);
@@ -103,13 +146,24 @@ exports.getSlide = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const slide = await Slide.findById(id);
+    // Base URL for constructing the full image path
+    const baseUrl = `${req.protocol}://${req.get('host')}/uploads/`;
+
+    const slide = await Slide.findById(id).populate('imageUrl', 'path'); // Populate the imageUrl field to fetch the path
+
     if (!slide) {
       return res.status(404).json({ message: 'Slide not found' });
     }
 
+    // Construct the full image URL if imageUrl exists
+    const slideObj = slide.toObject();
+    if (slideObj.imageUrl && slideObj.imageUrl.path) {
+      slideObj.imageUrl = `${baseUrl}${slideObj.imageUrl.path.split('\\').pop()}`;
+    }
+
     return res.status(200).json({
-      slide
+      message: 'Slide retrieved successfully',
+      slide: slideObj,
     });
   } catch (error) {
     console.error(error);
@@ -121,7 +175,7 @@ exports.getSlide = async (req, res) => {
 exports.updateSlide = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, content, media, position } = req.body;
+    const { title, content, imageUrl, position } = req.body;
 
     const slide = await Slide.findById(id);
     if (!slide) {
@@ -131,7 +185,7 @@ exports.updateSlide = async (req, res) => {
     // Update slide fields
     slide.title = title || slide.title;
     slide.content = content || slide.content;
-    slide.media = media || slide.media;
+    slide.imageUrl = media || slide.imageUrl;
     slide.position = position || slide.position;
 
     await slide.save();
