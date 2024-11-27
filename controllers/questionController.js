@@ -1,5 +1,6 @@
 const Question = require('../models/question');
 const Quiz = require('../models/quiz');
+const Media = require('../models/Media');
 
 // Add a new question to a quiz
 exports.addQuestion = async (req, res) => {

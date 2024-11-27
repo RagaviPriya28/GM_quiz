@@ -4,7 +4,10 @@ const slideSchema = new mongoose.Schema({
   quiz: { type: mongoose.Schema.Types.ObjectId, ref: 'Quiz', required: true },
   title: { type: String, required: true },
   content: { type: String, required: true },
-  media: { type: String }, // URL to an image or video
+  imageUrl: {
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Media',
+    required: true },
   position: { type: Number, required: true },
 });
 

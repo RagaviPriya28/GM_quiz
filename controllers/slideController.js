@@ -6,7 +6,7 @@ const { checkAdmin } = require('../middlewares/auth');  // Middleware to check i
 exports.addSlide = async (req, res) => {
   try {
     const { quizId } = req.params;
-    const { title, content, media, position } = req.body;
+    const { title, content, imageUrl, position } = req.body;
 
     // Check if quiz exists
     const quiz = await Quiz.findById(quizId);
@@ -19,7 +19,7 @@ exports.addSlide = async (req, res) => {
       quiz: quizId,
       title,
       content,
-      media,
+      imageUrl,
       position
     });
 
@@ -36,6 +36,27 @@ exports.addSlide = async (req, res) => {
 };
 
 // Get all slides for a specific quiz
+// exports.getSlides = async (req, res) => {
+//   try {
+//     const { quizId } = req.params;
+
+//     // Check if quiz exists
+//     const quiz = await Quiz.findById(quizId);
+//     if (!quiz) {
+//       return res.status(404).json({ message: 'Quiz not found' });
+//     }
+
+//     const slides = await Slide.find({ quiz: quizId }).sort({ position: 1 });
+
+//     return res.status(200).json({
+//       slides
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ message: 'Server error', error: error.message });
+//   }
+// };
+
 exports.getSlides = async (req, res) => {
   try {
     const { quizId } = req.params;
@@ -46,14 +67,31 @@ exports.getSlides = async (req, res) => {
       return res.status(404).json({ message: 'Quiz not found' });
     }
 
-    const slides = await Slide.find({ quiz: quizId }).sort({ position: 1 });
+    // Base URL for constructing the full image path
+    const baseUrl = `${req.protocol}://${req.get('host')}/uploads/`;
 
-    return res.status(200).json({
-      slides
+    // Find slides related to the quiz and populate the imageUrl field
+    const slides = await Slide.find({ quiz: quizId }).sort({ position: 1 })
+      .populate('imageUrl', 'path'); // Populate the imageUrl field to fetch the path field from the Media collection
+
+    if (slides.length === 0) {
+      return res.status(404).json({ message: 'No slides found for this quiz' });
+    }
+
+    // Map through slides and append the full image URL
+    const slidesWithFullImageUrl = slides.map(slide => {
+      const slideObj = slide.toObject();
+      if (slideObj.imageUrl && slideObj.imageUrl.path) {
+        slideObj.imageUrl = `${baseUrl}${slideObj.imageUrl.path.split('\\').pop()}`;
+      }
+      return slideObj;
     });
+
+    // Return the slides with the full image URL
+    res.status(200).json(slidesWithFullImageUrl);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
