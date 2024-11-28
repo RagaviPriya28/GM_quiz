@@ -29,10 +29,24 @@ exports.uploadMedia = async (req, res) => {
 exports.getMediaDetails = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: 'Media ID is required' });
+    }
     const media = await Media.findById(id);
     if (!media) return res.status(404).json({ message: 'Media not found' });
 
-    res.status(200).json({ media });
+    // Construct the full URL for the media file
+    const host = req.protocol + '://' + req.get('host'); // e.g., http://localhost:5000
+    const encodedPath = media.path.replace(/ /g, '%20').replace(/\\/g, '/'); // Encode spaces, normalize slashes
+    const url = `${host}/${encodedPath}`;
+
+    // Return media details with the URL
+    res.status(200).json({
+      media: {
+        ...media.toObject(),
+        url,
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }
@@ -42,6 +56,10 @@ exports.getMediaDetails = async (req, res) => {
 exports.deleteMedia = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: 'Media ID is required' });
+    }
+    
     const media = await Media.findById(id);
     if (!media) return res.status(404).json({ message: 'Media not found' });
 
@@ -91,14 +109,19 @@ exports.getAllMedia = async (req, res) => {
 
     // Construct full URL for each media file
     const host = req.protocol + '://' + req.get('host'); // e.g., http://localhost:5000
-    const mediaWithPaths = media.map((item) => ({
-      ...item.toObject(),
-      url: `${host}/${item.path.replace(/\\/g, '/')}`, // Convert backslashes to forward slashes
-    }));
+    const mediaWithPaths = media.map((item) => {
+      // Replace only spaces with %20
+      const encodedPath = item.path.replace(/ /g, '%20').replace(/\\/g, '/'); // Also convert backslashes to forward slashes
+      return {
+        ...item.toObject(),
+        url: `${host}/${encodedPath}`, // Use encoded path in URL
+      };
+    });
 
     res.status(200).json({ media: mediaWithPaths });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }
 };
+
 
