@@ -33,9 +33,11 @@ const { protect } = require('../middlewares/authMiddleware');
 const {
   createSession,
   joinSession,
+  getSessionPlayers,
   startSession,
   getSessionQuestions,
-  getSessionPlayers,
+  changeQuestionByCodeAndSession,
+  getCurrentQuestionInSession,
   endSession,
 } = require('../controllers/sessionController');
 
@@ -43,19 +45,28 @@ const {
 router.post('/api/sessions/:quizId/create', protect, createSession);
 
 // Join a session
-router.post('/api/sessions/:joinCode/join', protect, joinSession);
-
-// Start the session
-router.post('/api/sessions/:joinCode/start', protect, startSession);
-
-// Fetch questions for a session
-router.get('/api/sessions/:joinCode/questions', protect, getSessionQuestions);
-
-// End the session
-router.post('/api/sessions/:joinCode/end', protect, endSession);
+router.post('/api/sessions/:joinCode/:sessionId/join', protect, joinSession);
 
 // Get players who joined a session
-router.get('/api/sessions/:joinCode/players', protect, getSessionPlayers);
+router.get('/api/sessions/:joinCode/:sessionId/players', protect, getSessionPlayers);
+
+// Start the session
+router.post('/api/sessions/:joinCode/:sessionId/start', protect, startSession);
+
+// Fetch questions for a session
+router.get('/api/sessions/:joinCode/:sessionId/questions', protect, getSessionQuestions);
+
+// Route: Change a question in the session by joinCode, sessionId, and questionId
+router.put('/api/sessions/:joinCode/:sessionId/:questionId/change', protect, changeQuestionByCodeAndSession);
+
+// Route: Get the current question in the session by joinCode and sessionId
+router.get('/api/sessions/:joinCode/:sessionId/current-question', protect, getCurrentQuestionInSession);
+
+
+// End the session 
+router.post('/api/sessions/:joinCode/:sessionId/end', protect, endSession);
+
+
 
 
 module.exports = router;
