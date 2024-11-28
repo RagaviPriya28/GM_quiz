@@ -185,7 +185,7 @@ exports.updateSlide = async (req, res) => {
     // Update slide fields
     slide.title = title || slide.title;
     slide.content = content || slide.content;
-    slide.imageUrl = media || slide.imageUrl;
+    slide.imageUrl = imageUrl || slide.imageUrl;
     slide.position = position || slide.position;
 
     await slide.save();
