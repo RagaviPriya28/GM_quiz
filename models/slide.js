@@ -13,7 +13,7 @@ const slideSchema = new mongoose.Schema({
   imageUrl: {
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Media',
-    required: true },
+    required: false },
   position: { type: Number, required: false },
 });
 

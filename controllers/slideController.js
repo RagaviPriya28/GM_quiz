@@ -3,6 +3,7 @@ const Quiz = require('../models/quiz');    // Quiz model
 const Media = require('../models/Media');
 
 
+// add slide
 exports.addSlide = async (req, res) => {
   try {
     const { quizId } = req.params;
@@ -20,17 +21,21 @@ exports.addSlide = async (req, res) => {
       return res.status(400).json({ message: `Invalid type. Valid types are: ${validTypes.join(', ')}` });
     }
 
-    // Fetch the image document by ID (using Media model)
-    const image = await Media.findById(imageUrl); // Make sure imageUrl is the media _id
-    if (!image) {
-      return res.status(404).json({ message: 'Image not found' });
+    let fullImageUrl = null;
+
+    if (imageUrl) {
+      // Fetch the image document by ID (using Media model)
+      const image = await Media.findById(imageUrl); // Make sure imageUrl is the media _id
+      if (!image) {
+        return res.status(404).json({ message: 'Image not found' });
+      }
+
+      // Base URL for constructing the full image path
+      const baseUrl = `${req.protocol}://${req.get('host')}/uploads/`;
+
+      // Construct the full image URL (from the Media path)
+      fullImageUrl = `${baseUrl}${encodeURIComponent(image.path.split('\\').pop())}`;
     }
-
-    // Base URL for constructing the full image path
-    const baseUrl = `${req.protocol}://${req.get('host')}/uploads/`;
-
-    // Construct the full image URL (from the Media path)
-    const fullImageUrl = `${baseUrl}${encodeURIComponent(image.path.split('\\').pop())}`;
 
     // Create new slide
     const newSlide = new Slide({
@@ -38,7 +43,7 @@ exports.addSlide = async (req, res) => {
       title,
       content,
       type,
-      imageUrl: image._id, // Save the image ID in the database
+      imageUrl: imageUrl || null, // Save the image ID if provided, otherwise null
       position,
     });
 
@@ -48,10 +53,10 @@ exports.addSlide = async (req, res) => {
     quiz.slides.push(newSlide._id);
     await quiz.save();
 
-    // Include the full image URL in the response
+    // Prepare the response slide object
     const responseSlide = {
       ...newSlide.toObject(),
-      imageUrl: fullImageUrl, // Replace image ID with the full URL in the response
+      imageUrl: fullImageUrl, // Replace image ID with the full URL if it exists, else null
     };
 
     return res.status(201).json({
@@ -63,6 +68,7 @@ exports.addSlide = async (req, res) => {
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 
 
 exports.getSlides = async (req, res) => {
