@@ -1,6 +1,6 @@
 const Slide = require('../models/slide');  // Slide model
 const Quiz = require('../models/quiz');    // Quiz model
-const { checkAdmin } = require('../middlewares/auth');  // Middleware to check if user is admin
+const Media = require('../models/Media');
 
 
 exports.addSlide = async (req, res) => {
@@ -135,14 +135,15 @@ exports.getSlide = async (req, res) => {
 };
 
 
-
 // Update a slide (admin only)
+
 exports.updateSlide = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, content, imageUrl, position } = req.body;
+    const { title, content, type, imageUrl, position } = req.body;
 
-    const slide = await Slide.findById(id).populate('imageUrl', 'path'); // Populate imageUrl for fetching path if it's updated
+    // Fetch the slide to update
+    const slide = await Slide.findById(id).populate('imageUrl', 'path'); // Populate existing imageUrl for path
     if (!slide) {
       return res.status(404).json({ message: 'Slide not found' });
     }
@@ -150,34 +151,50 @@ exports.updateSlide = async (req, res) => {
     // Base URL for constructing the full image path
     const baseUrl = `${req.protocol}://${req.get('host')}/uploads/`;
 
-    // Update slide fields
+    let fullImageUrl = null; // Initialize fullImageUrl for response
+
+    // If imageUrl is provided, fetch the Media document and validate
+    if (imageUrl) {
+      const image = await Media.findById(imageUrl);
+      if (!image) {
+        return res.status(404).json({ message: 'Image not found' });
+      }
+      slide.imageUrl = image._id; // Update imageUrl in the slide
+      fullImageUrl = `${baseUrl}${encodeURIComponent(image.path.split('\\').pop())}`; // Construct full image URL
+    } else if (slide.imageUrl && slide.imageUrl.path) {
+      // Retain the existing imageUrl
+      fullImageUrl = `${baseUrl}${encodeURIComponent(slide.imageUrl.path.split('\\').pop())}`;
+    }
+
+    // Update other slide fields
     if (title) slide.title = title;
     if (content) slide.content = content;
-    if (imageUrl) slide.imageUrl = imageUrl; // Assuming imageUrl is the ID of a Media document
+    if (type) slide.type = type;
     if (position) slide.position = position;
+    
 
     await slide.save();
 
-    // Construct the full image URL for the response
-    const updatedSlide = slide.toObject();
-    if (updatedSlide.imageUrl && updatedSlide.imageUrl.path) {
-      updatedSlide.imageUrl = `${baseUrl}${encodeURIComponent(updatedSlide.imageUrl.path.split('\\').pop())}`;
-    }
+    // Prepare updated fields for the response
+    const updatedFields = {
+      title: slide.title,
+      content: slide.content,
+      type: slide.type,
+      imageUrl: fullImageUrl, // Include full image URL in the response
+      position: slide.position,
+    };
 
     return res.status(200).json({
       message: 'Slide updated successfully',
-      updatedFields: {
-        title: updatedSlide.title,
-        content: updatedSlide.content,
-        imageUrl: updatedSlide.imageUrl,
-        position: updatedSlide.position,
-      },
+      updatedFields,
     });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+
 
 
 // Delete a slide (admin only)
