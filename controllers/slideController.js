@@ -16,7 +16,7 @@ exports.addSlide = async (req, res) => {
     }
 
     // Validate the type
-    const validTypes = ['Classic', 'Big Title', 'Bullet Points'];
+    const validTypes = ['classic', 'big_title', 'bullet_points'];
     if (!validTypes.includes(type)) {
       return res.status(400).json({ message: `Invalid type. Valid types are: ${validTypes.join(', ')}` });
     }
@@ -68,7 +68,6 @@ exports.addSlide = async (req, res) => {
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
-
 
 
 exports.getSlides = async (req, res) => {
