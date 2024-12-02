@@ -57,7 +57,7 @@ router.post('/api/sessions/:joinCode/:sessionId/start', protect, startSession);
 router.get('/api/sessions/:joinCode/:sessionId/questions', protect, getSessionQuestions);
 
 // Route: Change a question in the session by joinCode, sessionId, and questionId
-router.put('/api/sessions/:joinCode/:sessionId/:questionId/change', protect, changeQuestionByCodeAndSession);
+router.post('/api/sessions/:joinCode/:sessionId/:questionId/change', protect, changeQuestionByCodeAndSession);
 
 // Route: Get the current question in the session by joinCode and sessionId
 router.get('/api/sessions/:joinCode/:sessionId/current-question', protect, getCurrentQuestionInSession);
